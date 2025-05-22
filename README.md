@@ -1,29 +1,24 @@
-# Create T3 App
+# Linguini
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Authors:
 
-## What's next? How do I make an app with this?
+- Balaji Leninrajan
+- Jane Zeng
+- Julia Ilioukhina
+- Mariya Turetska
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Running a local instance of the app
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+- Install mysql and mysql server if not already installed
+- Run `npm install` to install the dependencies
+- Copy the `.env.example` file to `.env` and fill in the values
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+```js
+DB_HOST = localhost;
+DB_USER = root;
+DB_PASSWORD = password;
+DB_NAME = demo_db;
+```
 
-## Learn More
-
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+- Run `npm run init:db` to create the database and tables
+- Run `npm run dev` to run in dev
