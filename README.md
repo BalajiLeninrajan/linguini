@@ -13,11 +13,11 @@ Authors:
 - Run `npm install` to install the dependencies
 - Copy the `.env.example` file to `.env` and fill in the values
 
-```js
-DB_HOST = localhost;
-DB_USER = root;
-DB_PASSWORD = password;
-DB_NAME = demo_db;
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=demo_db
 ```
 
 - Run `npm run init:db` to create the database and tables
