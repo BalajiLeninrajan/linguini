@@ -3,6 +3,7 @@ import { env } from "../env.js";
 
 const pool = mysql.createPool({
   host: env.DB_HOST,
+  port: env.DB_PORT,
   user: env.DB_USER,
   database: env.DB_NAME,
   password: env.DB_PASSWORD,
