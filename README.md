@@ -16,6 +16,7 @@ Authors:
 ```env
 DB_HOST=localhost
 DB_USER=root
+DB_PORT=3306
 DB_PASSWORD=password
 DB_NAME=demo_db
 ```
