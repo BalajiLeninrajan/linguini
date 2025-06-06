@@ -1,18 +1,11 @@
 import { z } from "zod";
-
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { sql } from "~/server/db";
 
-// Mocked DB
-interface Post {
+type Post = {
   id: number;
-  name: string;
-}
-const posts: Post[] = [
-  {
-    id: 1,
-    name: "Hello World",
-  },
-];
+  message: string;
+};
 
 export const postRouter = createTRPCRouter({
   hello: publicProcedure
@@ -26,15 +19,27 @@ export const postRouter = createTRPCRouter({
   create: publicProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ input }) => {
-      const post: Post = {
-        id: posts.length + 1,
-        name: input.name,
-      };
-      posts.push(post);
-      return post;
+      const result = await sql<Post[]>`
+        INSERT INTO hello_world (message)
+        VALUES (${input.name})
+        RETURNING id, message
+      `;
+
+      if (!result[0]) {
+        throw new Error("Failed to create post");
+      }
+
+      return result[0];
     }),
 
-  getLatest: publicProcedure.query(() => {
-    return posts.at(-1) ?? null;
+  getLatest: publicProcedure.query(async () => {
+    const result = await sql<Post[]>`
+      SELECT id, message
+      FROM hello_world
+      ORDER BY id DESC
+      LIMIT 1
+    `;
+
+    return result[0] ?? null;
   }),
 });
