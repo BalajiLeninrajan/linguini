@@ -9,16 +9,13 @@ Authors:
 
 ## Running a local instance of the app
 
-- Install mysql and mysql server if not already installed
+- Spin up a PostgreSQL database, we recommend using [Neon](https://neon.com/)
 - Run `npm install` to install the dependencies
 - Copy the `.env.example` file to `.env` and fill in the values
 
 ```env
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=password
-DB_NAME=demo_db
+DATABASE_URL="postgres://user:password@host.db.neon.tech/dbname?sslmode=require"
 ```
 
-- Run `npm run init:db` to create the database and tables
+- TODO: CREATE NEW INIT SCRIPT
 - Run `npm run dev` to run in dev
