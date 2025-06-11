@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LinguiniStyles } from '../layout';
+import { LinguiniStyles } from '~/styles/styles';
 
 export default function GamePage() {
   const [timeLeft, setTimeLeft] = useState({ minutes: 2, seconds: 34 });
