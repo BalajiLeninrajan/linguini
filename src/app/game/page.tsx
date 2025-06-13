@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { LinguiniStyles } from '~/styles/styles';
+import { Input } from '~/components/ui/input';
+import { Button } from '~/components/ui/button';
 
 export default function GamePage() {
   const [timeLeft, setTimeLeft] = useState({ minutes: 2, seconds: 34 });
@@ -42,19 +44,15 @@ export default function GamePage() {
 
       {/* Input */}
       <div className={LinguiniStyles.layout.inputContainer}>
-        <input
+        <Input
           type="text"
           value={inputWord}
           onChange={(e) => setInputWord(e.target.value)}
           placeholder="Enter your word here..."
-          className={LinguiniStyles.input.default}
         />
-        <button
-          onClick={handleSkipCategory}
-          className={LinguiniStyles.button.default}
-        >
-          Skip Category
-        </button>
+        <Button onClick={handleSkipCategory}>
+            Skip Category
+        </Button>
       </div>
     </div>
   );

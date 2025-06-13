@@ -25,13 +25,4 @@ export const LinguiniStyles = {
     countBox: "text-center",
     inputContainer: "w-full max-w-lg flex flex-col items-center gap-4",
   },
-  input: {
-    default: `w-full h-14 px-6 rounded-3xl bg-white/50 
-              text-center text-lg font-inter text-[#888888]
-              border border-[#888888]/20 placeholder-[#888888]/60
-              focus:outline-none focus:border-[#7A532A]`,
-  },
-  button: {
-    default: "bg-[#8E6329] text-white px-8 py-3 rounded-3xl hover:bg-opacity-90 transition-colors w-full h-14 text-lg",
-  }
 }; 
