@@ -8,6 +8,23 @@ import Link from 'next/link';
 import LoginPage from '../login/page';
 
 export default function SignupPage() {
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+    const createAccount = () => {
+        console.log(username, email, password, passwordConfirmation)
+        
+        if(passwordConfirmation != password){
+            alert("Your passwords do not match! Please try again.")
+            setPassword("");
+            setPasswordConfirmation("");
+        }
+
+        //check if username or email exist in the db
+    }
+
     return(
         <div className='min-h-screen flex items-center justify-center min-h-screen bg-[#FFF1D4]'>
             <div className='w-1/4'>
@@ -24,6 +41,8 @@ export default function SignupPage() {
                             type="text"
                             placeholder="Username"
                             required
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                         />
                         </div>
                         <div className="grid gap-1">
@@ -32,6 +51,8 @@ export default function SignupPage() {
                             type="email"
                             placeholder="Email"
                             required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                         </div>
                         <div className="grid gap-2">
@@ -40,6 +61,8 @@ export default function SignupPage() {
                             type="password"
                             placeholder="Password"
                             required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                         </div>
                         <div className="grid gap-2">
@@ -48,13 +71,15 @@ export default function SignupPage() {
                             type="password"
                             placeholder="Confirm Password"
                             required
+                            value={passwordConfirmation}
+                            onChange={(e) => setPasswordConfirmation(e.target.value)}
                         />
                         </div>
                     </div>
                     </form>
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <Button variant="brownPrimary" type="submit" className="w-full">
+                    <Button variant="brownPrimary" type="submit" className="w-full" onClick={createAccount}>
                     Create Account
                     </Button>
                 </CardFooter>
