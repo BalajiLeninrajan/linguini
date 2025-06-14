@@ -13,6 +13,7 @@ export const env = createEnv({
       .string()
       .default("false")
       .transform((val) => val == "true"),
+    JWT_SECRET: z.string().nonempty(),
   },
 
   /**
@@ -32,6 +33,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     DATABASE_URL: process.env.DATABASE_URL,
     USE_LOCAL: process.env.USE_LOCAL,
+    JWT_SECRET: process.env.JWT_SECRET,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
