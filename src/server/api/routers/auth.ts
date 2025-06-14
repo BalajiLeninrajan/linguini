@@ -1,8 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { sql, type DBUser } from "~/server/db";
+import { signJWT } from "~/server/jwt";
 
 type User = Omit<DBUser, "password" | "created_at">;
 
@@ -47,7 +52,14 @@ export const authRouter = createTRPCRouter({
           });
         }
 
-        return newUser;
+        const token = signJWT({
+          userId: newUser.id,
+        });
+
+        return {
+          user: newUser,
+          token,
+        };
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
@@ -92,7 +104,14 @@ export const authRouter = createTRPCRouter({
           });
         }
 
-        return user as User;
+        const token = signJWT({
+          userId: user.id,
+        });
+
+        return {
+          user: user as User,
+          token,
+        };
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
@@ -104,4 +123,18 @@ export const authRouter = createTRPCRouter({
         });
       }
     }),
+
+  currentUser: protectedProcedure.query(async ({ ctx }) => {
+    const user: User[] = await sql`
+      SELECT id, email, username FROM users WHERE id = ${ctx.user.userId}
+    `;
+    return user[0] ?? null;
+  }),
+
+  refreshToken: protectedProcedure.mutation(({ ctx }) => {
+    const token = signJWT({
+      userId: ctx.user.userId,
+    });
+    return { token };
+  }),
 });
