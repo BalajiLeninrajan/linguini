@@ -124,7 +124,10 @@ export const authRouter = createTRPCRouter({
       }
     }),
 
-  currentUser: protectedProcedure.query(async ({ ctx }) => {
+  currentUser: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) {
+      return null;
+    }
     const user: User[] = await sql`
       SELECT id, email, username FROM users WHERE id = ${ctx.user.userId}
     `;

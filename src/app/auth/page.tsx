@@ -120,8 +120,10 @@ export default function AuthPage() {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-[#2e026d] p-2 text-white hover:bg-[#15162c]"
-            disabled={login.isPending || register.isPending}
+            className="w-full rounded-lg bg-[#2e026d] p-2 text-white hover:bg-[#15162c] disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60"
+            disabled={
+              login.isPending || register.isPending || currentUser.data != null
+            }
           >
             {login.isPending || register.isPending
               ? "Loading..."
@@ -132,11 +134,15 @@ export default function AuthPage() {
         </form>
 
         <button
-          className="w-full rounded-lg bg-[#2e026d] p-2 text-white hover:bg-[#15162c]"
+          className="w-full rounded-lg bg-[#2e026d] p-2 text-white hover:bg-[#15162c] disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60"
           disabled={currentUser.isPending || !currentUser.data}
           onClick={handleLogout}
         >
-          logout
+          {currentUser.isPending
+            ? "Loading..."
+            : currentUser.data
+              ? "Logout"
+              : "Not logged in"}
         </button>
         <button
           className="mt-4 w-full text-center text-sm text-gray-300 hover:text-white"
