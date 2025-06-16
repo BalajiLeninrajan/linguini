@@ -9,7 +9,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { verifyJWT } from "~/server/jwt";
+import { verifyJWT } from "~/server/utils/jwt";
 
 /**
  * 1. CONTEXT
