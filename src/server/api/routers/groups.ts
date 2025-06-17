@@ -1,13 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { type User } from "~/server/api/routers/auth";
-import { sql, type DBGroup } from "~/server/db";
-
-type Group = DBGroup & {
-  users: User[];
-  owner: User;
-};
+import { sql, type DBGroup, type DBGroupUser } from "~/server/db";
+import type { Group } from "~/types";
 
 export const groupsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -19,12 +14,37 @@ export const groupsRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const { name } = input;
       try {
-        const result: DBGroup[] = await sql`
+        const groupInsertResult: DBGroup[] = await sql`
           INSERT INTO groups (name)
           VALUES (${name})
           RETURNING *
         `;
-        const group;
+        const newGroupRow = groupInsertResult[0];
+        if (!newGroupRow) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group",
+          });
+        }
+
+        const ownerInsertResult: DBGroupUser[] = await sql`
+          INSERT INTO group_users (group_id, user_id, is_owner)
+          VALUES (${newGroupRow.id}, ${ctx.user.userId}, true)
+          RETURNING *
+        `;
+        const newGroupUserRow = ownerInsertResult[0];
+        if (!newGroupUserRow) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group",
+          });
+        }
+
+        const group: Group = {
+          ...newGroupRow,
+          owner: ctx.user,
+          members: [],
+        };
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
