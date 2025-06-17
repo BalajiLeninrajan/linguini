@@ -26,6 +26,8 @@ export const authRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { email, username, password } = input;
       try {
+        await sql`BEGIN`;
+
         const existingUsers: Pick<DBUser, "id">[] = await sql`
           SELECT id FROM users WHERE email = ${email} OR username = ${username}
         `;
@@ -55,11 +57,14 @@ export const authRouter = createTRPCRouter({
           userId: newUser.id,
         });
 
+        await sql`COMMIT`;
         return {
           user: newUser,
           token,
         };
       } catch (error) {
+        await sql`ROLLBACK`;
+
         if (error instanceof TRPCError) {
           throw error;
         }
