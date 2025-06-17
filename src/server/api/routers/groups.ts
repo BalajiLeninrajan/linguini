@@ -335,6 +335,8 @@ export const groupsRouter = createTRPCRouter({
           members: memberRows,
         };
       } catch (error) {
+        await sql`ROLLBACK`;
+
         if (error instanceof TRPCError) {
           throw error;
         }
