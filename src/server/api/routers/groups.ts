@@ -14,6 +14,7 @@ export const groupsRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       const { name } = input;
       try {
+        await sql`BEGIN`;
         const groupInsertResult: DBGroup[] = await sql`
           INSERT INTO groups (name)
           VALUES (${name})
@@ -29,7 +30,7 @@ export const groupsRouter = createTRPCRouter({
 
         const ownerInsertResult: DBGroupUser[] = await sql`
           INSERT INTO group_users (group_id, user_id, is_owner)
-          VALUES (${newGroupRow.id}, ${ctx.user.userId}, true)
+          VALUES (${newGroupRow.id}, ${ctx.user.id}, true)
           RETURNING *
         `;
         const newGroupUserRow = ownerInsertResult[0];
@@ -39,13 +40,16 @@ export const groupsRouter = createTRPCRouter({
             message: "Failed to create group",
           });
         }
+        await sql`COMMIT`;
 
-        const group: Group = {
+        return {
           ...newGroupRow,
           owner: ctx.user,
-          members: [],
-        };
+          members: [ctx.user],
+        } as Group;
       } catch (error) {
+        await sql`ROLLBACK`;
+
         if (error instanceof TRPCError) {
           throw error;
         }
