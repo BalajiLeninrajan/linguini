@@ -11,6 +11,17 @@ import { signJWT } from "~/server/utils/jwt";
 import type { User } from "~/types";
 
 export const authRouter = createTRPCRouter({
+  /**
+   * Registers a new user with email, username, and password.
+   * - Checks for existing email or username.
+   * - Hashes the password before storing.
+   * - Returns the new user and a JWT token on success.
+   * @param email User's email address
+   * @param username Desired username
+   * @param password Plaintext password
+   * @returns { user, token }
+   * @throws {TRPCError} If email or username exists, or registration fails
+   */
   register: publicProcedure
     .input(
       z.object({
@@ -76,6 +87,15 @@ export const authRouter = createTRPCRouter({
       }
     }),
 
+  /**
+   * Logs in a user using email or username and password.
+   * - Verifies user existence and password correctness.
+   * - Returns the user and a JWT token on success.
+   * @param identifier Email or username
+   * @param password Plaintext password
+   * @returns { user, token }
+   * @throws {TRPCError} If credentials are invalid or login fails
+   */
   login: publicProcedure
     .input(
       z.object({
@@ -128,8 +148,16 @@ export const authRouter = createTRPCRouter({
       }
     }),
 
+  /**
+   * Returns the currently authenticated user from the context.
+   * @returns The current user object or null if not authenticated
+   */
   currentUser: publicProcedure.query(async ({ ctx }) => ctx.user),
 
+  /**
+   * Issues a new JWT token for the currently authenticated user.
+   * @returns { token } New JWT token
+   */
   refreshToken: protectedProcedure.mutation(({ ctx }) => {
     const token = signJWT({
       userId: ctx.user.id,
