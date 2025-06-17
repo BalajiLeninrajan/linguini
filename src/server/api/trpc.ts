@@ -10,6 +10,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { verifyJWT } from "~/server/utils/jwt";
+import { sql } from "~/server/db";
+import type { User } from "~/types";
 
 /**
  * 1. CONTEXT
@@ -26,7 +28,14 @@ import { verifyJWT } from "~/server/utils/jwt";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const authHeader = opts.headers.get("authorization");
   const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  const user = token ? verifyJWT(token) : null;
+  const userId = token ? verifyJWT(token)?.userId : null;
+  let user: User | null = null;
+  if (userId != null) {
+    const result: User[] = await sql`
+      SELECT id, email, username FROM users WHERE id = ${userId}
+    `;
+    user = result[0] ?? null;
+  }
 
   return {
     ...opts,

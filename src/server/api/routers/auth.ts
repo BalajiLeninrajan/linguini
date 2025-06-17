@@ -123,19 +123,11 @@ export const authRouter = createTRPCRouter({
       }
     }),
 
-  currentUser: publicProcedure.query(async ({ ctx }) => {
-    if (!ctx.user) {
-      return null;
-    }
-    const user: User[] = await sql`
-      SELECT id, email, username FROM users WHERE id = ${ctx.user.userId}
-    `;
-    return user[0] ?? null;
-  }),
+  currentUser: publicProcedure.query(async ({ ctx }) => ctx.user),
 
   refreshToken: protectedProcedure.mutation(({ ctx }) => {
     const token = signJWT({
-      userId: ctx.user.userId,
+      userId: ctx.user.id,
     });
     return { token };
   }),
