@@ -51,9 +51,9 @@ export const authRouter = createTRPCRouter({
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result: User[] = await sql`
+        const result: Pick<DBUser, "id">[] = await sql`
           INSERT INTO users (email, username, password) VALUES (${email}, ${username}, ${hashedPassword})
-          RETURNING email, username, id
+          RETURNING id
         `;
 
         const newUser = result[0];
@@ -69,10 +69,7 @@ export const authRouter = createTRPCRouter({
         });
 
         await sql`COMMIT`;
-        return {
-          user: newUser,
-          token,
-        };
+        return token;
       } catch (error) {
         await sql`ROLLBACK`;
 
@@ -109,7 +106,7 @@ export const authRouter = createTRPCRouter({
       const { identifier, password } = input;
 
       try {
-        const result: DBUser[] = await sql`
+        const result: Pick<DBUser, "id" | "password">[] = await sql`
         SELECT * FROM users WHERE email = ${identifier} OR username = ${identifier}
       `;
 
@@ -132,10 +129,7 @@ export const authRouter = createTRPCRouter({
           userId: user.id,
         });
 
-        return {
-          user: user as User,
-          token,
-        };
+        return token;
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
