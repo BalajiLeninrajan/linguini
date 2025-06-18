@@ -68,7 +68,7 @@ export const authRouter = createTRPCRouter({
         });
 
         await sql`COMMIT`;
-        return token;
+        return { token };
       } catch (error) {
         await sql`ROLLBACK`;
 
@@ -128,7 +128,7 @@ export const authRouter = createTRPCRouter({
           userId: user.id,
         });
 
-        return token;
+        return { token };
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
