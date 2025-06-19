@@ -34,3 +34,8 @@ INSERT INTO plays (game_id, user_id, category_count, start_time, end_time) VALUE
 (1, 10, 3, '2025-06-18 11:10:00', '2025-06-18 11:28:00'),
 (1, 11, 53, '2025-06-18 11:10:00', '2025-06-18 11:40:00');
 
+INSERT INTO word_categories (word, category) VALUES
+  ('apple', 'fruit'),
+  ('banana', 'fruit');
+
+
