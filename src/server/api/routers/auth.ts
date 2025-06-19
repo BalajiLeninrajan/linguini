@@ -106,8 +106,8 @@ export const authRouter = createTRPCRouter({
 
       try {
         const result: Pick<DBUser, "id" | "password">[] = await sql`
-        SELECT * FROM users WHERE email = ${identifier} OR username = ${identifier}
-      `;
+          SELECT id, password FROM users WHERE email = ${identifier} OR username = ${identifier}
+        `;
 
         const user = result[0];
         if (!user) {
