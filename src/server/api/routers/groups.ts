@@ -19,11 +19,11 @@ async function addMemberToGroup(groupId: number, userId: number) {
       });
     }
 
-    const result: DBGroupUser[] = await sql`
+    const result: boolean[] = await sql`
       INSERT INTO group_users (group_id, user_id, is_owner)
       VALUES (${groupId}, ${userId}, false)
       ON CONFLICT (group_id, user_id) DO NOTHING
-      RETURNING *
+      RETURNING true
     `;
     if (!result[0]) {
       throw new TRPCError({
@@ -59,10 +59,10 @@ async function removeMemberFromGroup(groupId: number, userId: number) {
       });
     }
 
-    const result: DBGroupUser[] = await sql`
+    const result: boolean[] = await sql`
       DELETE FROM group_users
       WHERE group_id = ${groupId} AND user_id = ${userId} AND is_owner = false
-      RETURNING *
+      RETURNING true
     `;
     if (!result[0]) {
       throw new TRPCError({
@@ -113,10 +113,10 @@ export const groupsRouter = createTRPCRouter({
           });
         }
 
-        const ownerInsertResult: DBGroupUser[] = await sql`
+        const ownerInsertResult: boolean[] = await sql`
           INSERT INTO group_users (group_id, user_id, is_owner)
           VALUES (${newGroupRow.id}, ${ctx.user.id}, true)
-          RETURNING *
+          RETURNING true
         `;
         const newGroupUserRow = ownerInsertResult[0];
         if (!newGroupUserRow) {
@@ -164,7 +164,7 @@ export const groupsRouter = createTRPCRouter({
       try {
         await sql`BEGIN`;
 
-        const ownerCheckResult: DBGroupUser[] = await sql`
+        const ownerCheckResult: Pick<DBGroupUser, "is_owner">[] = await sql`
           SELECT is_owner FROM group_users
           WHERE group_id = ${groupId} AND user_id = ${ctx.user.id}
         `;
@@ -181,11 +181,11 @@ export const groupsRouter = createTRPCRouter({
           });
         }
 
-        const result: Pick<DBGroup, "id">[] = await sql`
+        const result: boolean[] = await sql`
           UPDATE groups
           SET name = ${name}
           WHERE id = ${groupId}
-          RETURNING id
+          RETURNING true
         `;
         if (!result[0]) {
           throw new TRPCError({
@@ -224,7 +224,7 @@ export const groupsRouter = createTRPCRouter({
       try {
         await sql`BEGIN`;
 
-        const ownerCheckResult: DBGroupUser[] = await sql`
+        const ownerCheckResult: Pick<DBGroupUser, "is_owner">[] = await sql`
           SELECT is_owner FROM group_users
           WHERE group_id = ${groupId} AND user_id = ${ctx.user.id}
         `;
@@ -244,10 +244,10 @@ export const groupsRouter = createTRPCRouter({
         await sql`
           DELETE FROM group_users WHERE group_id = ${input.groupId}
         `;
-        const result: number[] = await sql`
+        const result: boolean[] = await sql`
           DELETE FROM groups
           WHERE id = ${input.groupId}
-          RETURNING id
+          RETURNING true
         `;
         if (!result[0]) {
           throw new TRPCError({
