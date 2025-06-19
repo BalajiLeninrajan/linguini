@@ -62,7 +62,7 @@ export interface DBInvite {
 
 // games table
 export interface DBGame {
-  idma: number;
+  id: number;
   game_mode: GameModeType;
   seed: number;
   created_at: Date;
