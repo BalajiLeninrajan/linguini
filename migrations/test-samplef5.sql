@@ -1,0 +1,1 @@
+SELECT category FROM word_categories WHERE word = 'apple' AND category = 'fruit';
