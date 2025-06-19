@@ -1,0 +1,1 @@
+SELECT id, password FROM Users WHERE (username='linguini123' OR email='linguini@example.com');
