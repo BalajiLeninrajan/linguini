@@ -38,6 +38,6 @@ INSERT INTO word_categories (word, category) VALUES
   ('apple', 'fruit'),
   ('banana', 'fruit');
 
-INSERT INTO categories (category) VALUES ('fruits');
+INSERT INTO categories (category) VALUES ('fruit');
 
 
