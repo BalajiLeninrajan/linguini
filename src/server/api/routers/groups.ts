@@ -8,6 +8,17 @@ import type { Group, User } from "~/types";
 async function addMemberToGroup(groupId: number, userId: number) {
   try {
     await sql`BEGIN`;
+
+    const groupExists: Pick<DBGroup, "id">[] = await sql`
+      SELECT id FROM groups WHERE id = ${groupId}
+    `;
+    if (!groupExists[0]) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+    }
+
     const result: DBGroupUser[] = await sql`
       INSERT INTO group_users (group_id, user_id, is_owner)
       VALUES (${groupId}, ${userId}, false)
@@ -37,6 +48,17 @@ async function addMemberToGroup(groupId: number, userId: number) {
 async function removeMemberFromGroup(groupId: number, userId: number) {
   try {
     await sql`BEGIN`;
+
+    const groupExists: Pick<DBGroup, "id">[] = await sql`
+      SELECT id FROM groups WHERE id = ${groupId}
+    `;
+    if (!groupExists[0]) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Group not found",
+      });
+    }
+
     const result: DBGroupUser[] = await sql`
       DELETE FROM group_users
       WHERE group_id = ${groupId} AND user_id = ${userId} AND is_owner = false
@@ -159,11 +181,11 @@ export const groupsRouter = createTRPCRouter({
           });
         }
 
-        const result: DBGroup[] = await sql`
+        const result: Pick<DBGroup, "id">[] = await sql`
           UPDATE groups
           SET name = ${name}
           WHERE id = ${groupId}
-          RETURNING *
+          RETURNING id
         `;
         if (!result[0]) {
           throw new TRPCError({
