@@ -89,7 +89,6 @@ export interface DBWordCategory {
 
 // word_requests table
 export interface DBWordRequest {
-  id: number;
   user_id: number;
   word: string;
   category: string;
