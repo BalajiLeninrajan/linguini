@@ -14,6 +14,9 @@ INSERT INTO users (email, username, password, created_at) VALUES
 ('user2225@example.com', 'user2225', 'password123', '2025-06-18 11:00:00'),
 ('user395@example.com', 'user395', 'password39', '2025-06-18 11:00:00');
 
+INSERT INTO users (email, username, password, created_at) VALUES
+('linguini@example.com', 'linguini123', 'asd098dhok', '2025-06-18 11:30:00+00');
+
 INSERT INTO games (game_mode, seed, created_at) VALUES
 ('Classic', 12345, '2025-06-18 11:20:00');
 
