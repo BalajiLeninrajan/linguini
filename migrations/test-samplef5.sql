@@ -1,1 +1,1 @@
-SELECT *  FROM word_categories WHERE word = 'apple' AND category = 'fruit';
+SELECT * FROM word_categories WHERE word = 'apple' AND category = 'fruit';
