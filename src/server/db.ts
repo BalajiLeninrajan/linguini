@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import { env } from "../env.js";
+import { env } from "~/env";
 
 export const sql = neon(env.DATABASE_URL) as <T = unknown>(
   strings: TemplateStringsArray,
@@ -52,7 +52,6 @@ export interface DBGroupUser {
 
 // invites table
 export interface DBInvite {
-  id: number;
   sender_id: number;
   recipient_id: number;
   group_id: number;
@@ -75,11 +74,6 @@ export interface DBPlay {
   category_count: number;
   start_time: Date;
   end_time?: Date;
-}
-
-// words table
-export interface DBWord {
-  word: string;
 }
 
 // categories table
