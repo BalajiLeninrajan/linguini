@@ -20,7 +20,7 @@ DATABASE_URL="postgres://user:password@host.db.neon.tech/dbname?sslmode=require"
 - TODO: CREATE NEW INIT SCRIPT
 - Run `npm run dev` to run in dev
 
-## On wrangling data into the words and categories:
+## On loading data into the words and categories:
 
 - This was done on a separate repository on a jupyter notebook. You can check it out at
   [linguini-hypernyms-data](https://github.com/janez45/linguini-hypernyms-data)

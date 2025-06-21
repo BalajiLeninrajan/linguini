@@ -99,7 +99,7 @@ CREATE TABLE word_requests (
   FOREIGN KEY (category) REFERENCES categories (category)
 );
 
-CREATE INDEX IF NOT EXISTS  word_idx ON categories(word);
+CREATE INDEX IF NOT EXISTS  word_idx ON word_categories(word);
 
-CREATE INDEX IF NOT EXISTS category_idx ON categories(category);
+CREATE INDEX IF NOT EXISTS category_idx ON word_categories(category);
 
