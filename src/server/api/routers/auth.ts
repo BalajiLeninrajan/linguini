@@ -8,6 +8,7 @@ import {
 } from "~/server/api/trpc";
 import { sql, type DBUser } from "~/server/db";
 import { signJWT } from "~/server/utils/jwt";
+import type { User } from "~/types";
 
 export const authRouter = createTRPCRouter({
   /**
