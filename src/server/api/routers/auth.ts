@@ -8,6 +8,7 @@ import {
 } from "~/server/api/trpc";
 import { sql, type DBUser } from "~/server/db";
 import { signJWT } from "~/server/utils/jwt";
+import type { User } from "~/types";
 
 export const authRouter = createTRPCRouter({
   /**
@@ -18,7 +19,7 @@ export const authRouter = createTRPCRouter({
    * @param email User's email address
    * @param username Desired username
    * @param password Plaintext password
-   * @returns { user, token }
+   * @returns { token }
    * @throws {TRPCError} If email or username exists, or registration fails
    */
   register: publicProcedure
@@ -33,7 +34,7 @@ export const authRouter = createTRPCRouter({
           .min(8, "Password must be at least 8 characters long"),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input }): Promise<{ token: string }> => {
       const { email, username, password } = input;
       try {
         await sql`BEGIN`;
@@ -89,7 +90,7 @@ export const authRouter = createTRPCRouter({
    * - Returns the user and a JWT token on success.
    * @param identifier Email or username
    * @param password Plaintext password
-   * @returns { user, token }
+   * @returns { token }
    * @throws {TRPCError} If credentials are invalid or login fails
    */
   login: publicProcedure
@@ -101,7 +102,7 @@ export const authRouter = createTRPCRouter({
           .min(8, "Password must be at least 8 characters long"),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input }): Promise<{ token: string }> => {
       const { identifier, password } = input;
 
       try {
@@ -145,16 +146,20 @@ export const authRouter = createTRPCRouter({
    * Returns the currently authenticated user from the context.
    * @returns The current user object or null if not authenticated
    */
-  currentUser: publicProcedure.query(async ({ ctx }) => ctx.user),
+  currentUser: publicProcedure.query(
+    async ({ ctx }): Promise<User | null> => ctx.user,
+  ),
 
   /**
    * Issues a new JWT token for the currently authenticated user.
    * @returns { token } New JWT token
    */
-  refreshToken: protectedProcedure.mutation(({ ctx }) => {
-    const token = signJWT({
-      userId: ctx.user.id,
-    });
-    return { token };
-  }),
+  refreshToken: protectedProcedure.mutation(
+    ({ ctx }): Promise<{ token: string }> => {
+      const token = signJWT({
+        userId: ctx.user.id,
+      });
+      return { token };
+    },
+  ),
 });
