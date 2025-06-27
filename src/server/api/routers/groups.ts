@@ -96,7 +96,7 @@ export const groupsRouter = createTRPCRouter({
         name: z.string().min(1, "Group name is required"),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }): Promise<Group> => {
       const { name } = input;
       try {
         await sql`BEGIN`;
@@ -131,7 +131,7 @@ export const groupsRouter = createTRPCRouter({
           ...newGroupRow,
           owner: ctx.user,
           members: [ctx.user],
-        } as Group;
+        };
       } catch (error) {
         await sql`ROLLBACK`;
 
@@ -275,13 +275,15 @@ export const groupsRouter = createTRPCRouter({
    * Retrieves all group IDs in the system
    * @returns Array of group IDs
    */
-  getAllGroupIds: protectedProcedure.query(async () => {
-    const result: Pick<DBGroup, "id">[] = await sql`
+  getAllGroupIds: protectedProcedure.query(
+    async (): Promise<Pick<DBGroup, "id">[]> => {
+      const result: Pick<DBGroup, "id">[] = await sql`
       SELECT id
       FROM groups
     `;
-    return result.map((e) => e.id);
-  }),
+      return result;
+    },
+  ),
 
   /**
    * Retrieves detailed information about a specific group
@@ -295,7 +297,7 @@ export const groupsRouter = createTRPCRouter({
         groupId: z.number(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input }): Promise<Group> => {
       const { groupId } = input;
       try {
         const groupRows: (DBGroup & { owner_id: number })[] = await sql`
@@ -331,7 +333,7 @@ export const groupsRouter = createTRPCRouter({
           ...groupRow,
           owner,
           members: memberRows,
-        } as Group;
+        };
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
