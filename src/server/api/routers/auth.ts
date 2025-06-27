@@ -155,7 +155,7 @@ export const authRouter = createTRPCRouter({
    * @returns { token } New JWT token
    */
   refreshToken: protectedProcedure.mutation(
-    ({ ctx }): Promise<{ token: string }> => {
+    async ({ ctx }): Promise<{ token: string }> => {
       const token = signJWT({
         userId: ctx.user.id,
       });
