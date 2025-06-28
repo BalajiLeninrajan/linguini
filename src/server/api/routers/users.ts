@@ -76,7 +76,7 @@ async function deleteUser(userId: number) {
   }
 }
 
-export const userRouter = createTRPCRouter({
+export const usersRouter = createTRPCRouter({
   getById: protectedProcedure
     .input(
       z.object({
