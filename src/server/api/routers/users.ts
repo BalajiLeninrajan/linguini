@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { sql, type DBGroupUser } from "~/server/db";
+import type { User } from "~/types";
 
 async function getUserGroupIds(
   userId: number,
@@ -30,7 +31,36 @@ async function getUserGroupIds(
 async function deleteUser(userId: number) {
   try {
     await sql`BEGIN`;
-    // TODO: delete by id and clean up group relationships
+
+    const deleteUserResult: boolean[] = await sql`
+      DELETE FROM users 
+      WHERE id = ${userId} 
+      RETURNING true
+    `;
+
+    if (!deleteUserResult[0]) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    const ownedGroups = await getUserGroupIds(userId, true);
+    for (const group of ownedGroups) {
+      await sql`
+        DELETE FROM groups WHERE group_id = ${group.group_id}
+        RETURNING true
+      `;
+      await sql`
+        DELETE FROM group_users WHERE group_id = ${group.group_id}
+        RETURNING true
+      `;
+    }
+
+    await sql`
+      DELETE FROM group_users WHERE user_id = ${userId}
+    `;
+
     await sql`COMMIT`;
   } catch (error) {
     await sql`ROLLBACK`;
@@ -46,7 +76,30 @@ async function deleteUser(userId: number) {
   }
 }
 
-export const authRouter = createTRPCRouter({
+export const userRouter = createTRPCRouter({
+  getById: protectedProcedure
+    .input(
+      z.object({
+        userId: z.number().nonnegative(),
+      }),
+    )
+    .query(async ({ input }): Promise<User> => {
+      const { userId } = input;
+
+      const result: User[] = await sql`
+        SELECT id, email, username FROM users WHERE id = ${userId}
+      `;
+
+      if (!result[0]) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      return result[0];
+    }),
+
   deleteByID: protectedProcedure
     .input(
       z.object({
