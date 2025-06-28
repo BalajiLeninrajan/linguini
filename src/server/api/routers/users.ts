@@ -4,6 +4,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { sql, type DBGroupUser } from "~/server/db";
 import type { User } from "~/types";
 
+// helper function to get user group IDs
 async function getUserGroupIds(
   userId: number,
   owner = false,
@@ -28,6 +29,7 @@ async function getUserGroupIds(
   }
 }
 
+// helper function to delete a user and their groups
 async function deleteUser(userId: number) {
   try {
     await sql`BEGIN`;
@@ -77,6 +79,13 @@ async function deleteUser(userId: number) {
 }
 
 export const usersRouter = createTRPCRouter({
+  /**
+   * Retrieves a user by their ID.
+   * - Returns user details including email and username.
+   * @param userId The ID of the user to retrieve
+   * @returns User object
+   * @throws {TRPCError} If user is not found
+   */
   getById: protectedProcedure
     .input(
       z.object({
@@ -100,6 +109,13 @@ export const usersRouter = createTRPCRouter({
       return result[0];
     }),
 
+  /**
+   * Deletes a user by their ID.
+   * - Also deletes all groups owned by the user.
+   * - Removes user from all group memberships.
+   * @param userId The ID of the user to delete
+   * @throws {TRPCError} If user is not found or deletion fails
+   */
   deleteByID: protectedProcedure
     .input(
       z.object({
@@ -111,10 +127,22 @@ export const usersRouter = createTRPCRouter({
       await deleteUser(userId);
     }),
 
+  /**
+   * Deletes the currently authenticated user.
+   * - Also deletes all groups owned by the user.
+   * - Removes user from all group memberships.
+   * @throws {TRPCError} If deletion fails
+   */
   deleteCurrentUser: protectedProcedure.mutation(
     async ({ ctx }) => await deleteUser(ctx.user.id),
   ),
 
+  /**
+   * Gets all groups owned by a specific user.
+   * @param userId The ID of the user to check ownership for
+   * @returns Array of group IDs owned by the user
+   * @throws {TRPCError} If query fails
+   */
   getOwnedGroupsById: protectedProcedure
     .input(
       z.object({
@@ -126,10 +154,21 @@ export const usersRouter = createTRPCRouter({
       return await getUserGroupIds(userId, true);
     }),
 
+  /**
+   * Gets all groups owned by the currently authenticated user.
+   * @returns Array of group IDs owned by the current user
+   * @throws {TRPCError} If query fails
+   */
   getCurrentUserOwnedGroups: protectedProcedure.query(async ({ ctx }) => {
     return await getUserGroupIds(ctx.user.id, true);
   }),
 
+  /**
+   * Gets all groups a specific user is a member of.
+   * @param userId The ID of the user to check memberships for
+   * @returns Array of group IDs the user is a member of
+   * @throws {TRPCError} If query fails
+   */
   getGroupMembershipsById: protectedProcedure
     .input(
       z.object({
@@ -141,6 +180,11 @@ export const usersRouter = createTRPCRouter({
       return await getUserGroupIds(userId);
     }),
 
+  /**
+   * Gets all groups the currently authenticated user is a member of.
+   * @returns Array of group IDs the current user is a member of
+   * @throws {TRPCError} If query fails
+   */
   getCurrentUserGroupMemberships: protectedProcedure.query(async ({ ctx }) => {
     return await getUserGroupIds(ctx.user.id);
   }),
