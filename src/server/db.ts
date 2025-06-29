@@ -1,7 +1,29 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import { env } from "~/env";
 
-export const sql = neon(env.DATABASE_URL) as <T = unknown>(
+const DEV_CONFIG = {
+  connectionString: "postgres://postgres:postgres@db.localtest.me:5432/main",
+  fetchEndpoint: (host: string) => {
+    const [protocol, port] =
+      host === "db.localtest.me" ? ["http", 4444] : ["https", 443];
+    return `${protocol}://${host}:${port}/sql`;
+  },
+  wsProxy: (host: string) =>
+    host === "db.localtest.me" ? `${host}:4444/v2` : `${host}/v2`,
+  useSecureWebSocket: false,
+};
+
+if (env.USE_LOCAL) {
+  neonConfig.fetchEndpoint = DEV_CONFIG.fetchEndpoint;
+  neonConfig.wsProxy = DEV_CONFIG.wsProxy;
+  neonConfig.useSecureWebSocket = DEV_CONFIG.useSecureWebSocket;
+  neonConfig.webSocketConstructor = ws;
+}
+
+export const sql = neon(
+  env.USE_LOCAL ? DEV_CONFIG.connectionString : env.DATABASE_URL,
+) as <T = unknown>(
   strings: TemplateStringsArray,
   ...values: unknown[]
 ) => Promise<T>;
