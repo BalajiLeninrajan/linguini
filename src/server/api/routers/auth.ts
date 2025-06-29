@@ -143,6 +143,61 @@ export const authRouter = createTRPCRouter({
     }),
 
   /**
+   * Updates the authenticated user's password after verifying the old password.
+   * @param currentPassword Current password for verification
+   * @param newPassword New password to set
+   * @throws {TRPCError} If current password is invalid or update fails
+   */
+  updatePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1, "Current password is required"),
+        newPassword: z
+          .string()
+          .min(8, "New password must be at least 8 characters long"),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { currentPassword, newPassword } = input;
+
+      try {
+        await sql`BEGIN`;
+
+        const result: Pick<DBUser, "password">[] = await sql`
+          SELECT password FROM users WHERE id = ${ctx.user.id}
+        `;
+
+        const user = result[0];
+        if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Current password is incorrect",
+          });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await sql`
+          UPDATE users SET password = ${hashedPassword}
+          WHERE id = ${ctx.user.id}
+        `;
+
+        await sql`COMMIT`;
+      } catch (error) {
+        await sql`ROLLBACK`;
+
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update password",
+        });
+      }
+    }),
+
+  /**
    * Returns the currently authenticated user from the context.
    * @returns The current user object or null if not authenticated
    */
