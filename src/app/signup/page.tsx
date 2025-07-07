@@ -22,7 +22,7 @@ export default function SignupPage() {
             setPasswordConfirmation("");
         }
 
-        //check if username or email exist in the db
+        //call to the API to signup the user
     }
 
     return(
@@ -33,7 +33,7 @@ export default function SignupPage() {
                     <CardTitle>Sign up</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form onSubmit={e => {e.preventDefault(); createAccount();}} >
                     <div className="flex flex-col gap-3">
                         <div className="grid gap-1">
                         <Input
@@ -79,7 +79,7 @@ export default function SignupPage() {
                     </form>
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <Button variant="brownPrimary" type="submit" className="w-full" onClick={createAccount}>
+                    <Button variant="brownPrimary" type="submit" className="w-full">
                     Create Account
                     </Button>
                 </CardFooter>
