@@ -8,6 +8,13 @@ import SignupPage from '../signup/page';
 import Link from 'next/link';
 
 export default function LoginPage() {
+    const [usernameOrEmail, setUsernameOrEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const loginUser = () => {
+        //call to the API to login the user
+    }
+
     return(
         <div className='min-h-screen flex items-center justify-center bg-[#FFF1D4]'>
             <div className='w-1/4'>
@@ -16,7 +23,7 @@ export default function LoginPage() {
                     <CardTitle>Welcome Back</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form onSubmit={e => {e.preventDefault(); loginUser();}}>
                     <div className="flex flex-col gap-3">
                         <div className="grid gap-1">
                         <Input
@@ -24,6 +31,8 @@ export default function LoginPage() {
                             type="text"
                             placeholder="Username or Email"
                             required
+                            value={usernameOrEmail}
+                            onChange={(e) => setUsernameOrEmail(e.target.value)}
                         />
                         </div>
                         <div className="grid gap-1">
@@ -32,6 +41,8 @@ export default function LoginPage() {
                             type="password"
                             placeholder="Password"
                             required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                         </div>
                     </div>
