@@ -79,4 +79,4 @@ Here are the features implemented for Milestone 2:
 
 - User login: Authenticates users by verifying credentials against hashed passwords in the database. On successful login, a session token is generated for secure access. Input validation is performed to prevent invalid or malicious data. The implementation is part of the [auth router](src/server/api/routers/auth.ts#L99-L146).
 
-- Group creation: Enables authenticated users to create new groups. Input is validated. The implementation is part of the [group router](./src/server/api/routers/groups.ts.ts#L93-L147).
+- Group creation: Enables authenticated users to create new groups. Input is validated. The implementation is part of the [group router](/src/server/api/routers/groups.ts.ts#L93-L147).
