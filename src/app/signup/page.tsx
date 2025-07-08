@@ -82,7 +82,7 @@ export default function SignupPage() {
                         </form>
                     </CardContent>
                     <CardFooter className="flex-col gap-2">
-                        <Button variant="brownPrimary" type="submit" className="w-full">
+                        <Button variant="default" type="submit" className="w-full">
                         Create Account
                         </Button>
                     </CardFooter>
