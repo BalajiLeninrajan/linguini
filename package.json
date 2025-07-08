@@ -15,7 +15,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "init:db:local": "docker-compose up -d && docker exec -i linguini-postgres-1 psql -U postgres -d main < ./migrations/init.sql",
-    "db:local": "docker-compose up -d"
+    "db:local": "docker-compose up -d",
+    "hypernyms:load": "bash load-hypernyms-data/run.sh"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
