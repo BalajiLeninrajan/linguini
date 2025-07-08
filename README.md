@@ -70,3 +70,13 @@ Linguini is a project that uses a PostgreSQL database and Next. You can run it w
   ```
 
 - This script should be run once after initializing empty tables.
+
+## Milestone 2 | Implemented Features
+
+Here are the features implemented for Milestone 2:
+
+- User sign up: Allows new users to register by providing required information. Passwords are securely hashed before storage. Input validation ensures data integrity, and the system checks if the user already exists in the database to prevent duplicates. The implementation is part of the [auth router](src/server/api/routers/auth.ts#L25-L88).
+
+- User login: Authenticates users by verifying credentials against hashed passwords in the database. On successful login, a session token is generated for secure access. Input validation is performed to prevent invalid or malicious data. The implementation is part of the [auth router](src/server/api/routers/auth.ts#L99-L146).
+
+- Group creation: Enables authenticated users to create new groups. Input is validated. The implementation is part of the [group router](./src/server/api/routers/groups.ts.ts#L93-L147).
