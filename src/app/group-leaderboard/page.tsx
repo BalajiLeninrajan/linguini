@@ -9,35 +9,45 @@ export default function Leaderboard() {
     const [users, setUsers] = useState([
             {
                 ranking: 1,
-                username: "Alex",
+                username: "Patrick",
                 categoryCount: 3,
                 time: 53
             },
             {
                 ranking: 2,
-                username: "Julia",
+                username: "Mariya",
                 categoryCount: 3,
                 time: 53
             },
             {
                 ranking: 3,
-                username: "Balaji",
+                username: "Jane",
                 categoryCount: 3,
                 time: 53
             },
             {
                 ranking: 4,
-                username: "Nicolas",
-                categoryCount: 3,
-                time: 53
-            },
-            {
-                ranking: 5,
-                username: "George",
+                username: "Nikhil",
                 categoryCount: 3,
                 time: 53
             }
         ]);
+    
+    //hardcoding UI values for testing
+    const [groups, setGroups] = useState([
+        {
+            groupName: "Sigma",
+            groupId: "1"
+        },
+        {
+            groupName: "Delta",
+            groupId: "2"
+        },
+        {
+            groupName: "Polaris",
+            groupId: "3"
+        }
+    ])
 
     return(
         <>
@@ -46,7 +56,8 @@ export default function Leaderboard() {
                 <div className='w-1/3'>
                     <Card className="w-full">
                     <CardHeader>
-                        <CardTitle className='text-yellow-600 text-5xl'>Global Leaderboard</CardTitle>
+                        <CardTitle className='text-yellow-600 text-5xl'>GroupName</CardTitle>
+                        <CardTitle className='text-yellow-600 text-3xl font-light'>Leaderboard</CardTitle>
                     </CardHeader>
             
                     {users.map((value, key) => (
@@ -65,9 +76,21 @@ export default function Leaderboard() {
 
                     </Card>
                     
+                    <div className='absolute top-1/2 left-1/20 bg-[#F6CF81] p-6 rounded-3xl w-1/5'>
+                        <p className='font-bold text-amber-900 text-2xl text-center mb-4'>Checkout Your <br></br> Other Groups</p>
+                        {groups.map((value, key) => (
+                            <Link href='/' key={key}>
+                                <div className='flex flex-row justify-between w-full bg-white rounded-full p-3 px-6 mb-2'>
+                                    <span className='font-bold text-xl text-yellow-600'>{value.groupId}</span>
+                                    <span className='text-xl text-gray-600'>{value.groupName}</span>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                    
                     <div className='flex justify-center text-yellow-600 mt-6'>
                         <p className='text-3xl font-light'>Checkout out <span className='font-bold cursor-pointer font-bold'>
-                            <Link href='/group-leaderboard'>Friend Leaderboard</Link>
+                            <Link href='/leaderboard'>Global Leaderboard</Link>
                         </span></p>
                     </div>
                 </div>
