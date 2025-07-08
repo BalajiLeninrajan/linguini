@@ -2,7 +2,7 @@
 import {useState, useEffect} from 'react';
 import { Card, CardHeader, CardTitle} from '~/components/ui/card';
 import Link from 'next/link';
-import Header from '../_components/header';
+import Header from '../../_components/header';
 
 export default function Leaderboard() {
     //hardcoding UI values for testing
