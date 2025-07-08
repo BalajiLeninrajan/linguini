@@ -44,3 +44,8 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# loading the dataset of hypernyms
+load-hypernyms-data/data
+
+load-hypernyms-data/venv
