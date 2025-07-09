@@ -37,8 +37,14 @@ Linguini is a project that uses a PostgreSQL database and Next. You can run it w
    JWT_SECRET="your-secret-key"
    ```
 
-4. Use the contents of `migrations/init.sql` to create the tables (e.g. via the Neon dashboard SQL editor).
-5. Run `npm run dev` to start the development server.
+4. Set the `DATABASE_URL` environment variable (independent from the `.env` file):
+
+   ```sh
+   export DATABASE_URL="postgres://user:password@host.db.neon.tech/dbname?sslmode=require"
+   ```
+
+5. Run `npm run init:db` to create or reset tables.
+6. Run `npm run dev` to start the development server.
 
 ---
 
@@ -54,7 +60,7 @@ Linguini is a project that uses a PostgreSQL database and Next. You can run it w
    JWT_SECRET="your-secret-key"
    ```
 
-4. Run `npm run init:db:local` to start the local Postgres database and create tables.
+4. Run `npm run init:db:local` to start the local Postgres database and create or reset tables.
 5. For subsequent runs, use `npm run db:local` to start the database without recreating tables.
 6. Run `npm run dev` to start the development server.
 

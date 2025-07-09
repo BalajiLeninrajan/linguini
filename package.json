@@ -14,6 +14,7 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "init:db": "psql -d \"$DATABASE_URL\" -f ./migrations/init.sql",
     "init:db:local": "docker-compose up -d && docker exec -i linguini-postgres-1 psql -U postgres -d main < ./migrations/init.sql",
     "db:local": "docker-compose up -d",
     "hypernyms:load": "bash load-hypernyms-data/run.sh"
