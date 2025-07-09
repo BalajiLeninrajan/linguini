@@ -18,7 +18,7 @@ export default function GroupsPage() {
         <div className="w-1/3 flex flex-col items-center">
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className="text-4xl">My Groups</CardTitle>
+                        <CardTitle className='text-yellow-600 text-5xl'>My Groups</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-2 mb-6">
