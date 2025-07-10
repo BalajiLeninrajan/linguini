@@ -1,28 +1,49 @@
 'use client'
 import {useState, useEffect} from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter, CardContent } from '~/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 import { Input } from "~/components/ui/input"
-import { Label } from '~/components/ui/label';
 import { Button } from '~/components/ui/button';
 import Link from 'next/link';
-import LoginPage from '../login/page';
+import { api } from '~/trpc/react';
 
 export default function SignupPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
+    const [error, setError] = useState("");
 
-    const createAccount = () => {
+    const currentUser = api.auth.currentUser.useQuery(undefined, {
+        refetchOnWindowFocus: false,
+    });
+
+    const register = api.auth.register.useMutation({
+        onSuccess: async (data) => {
+            localStorage.setItem("token", data.token);
+            await currentUser.refetch();
+        },
+        onError: (error) => {
+            setError(error.message);
+        },
+    });
+
+
+    const createAccount = async (e: React.FormEvent<HTMLFormElement>) => {
         console.log(username, email, password, passwordConfirmation)
+        e.preventDefault();
         
         if(passwordConfirmation != password){
             alert("Your passwords do not match! Please try again.")
             setPassword("");
             setPasswordConfirmation("");
+        }else{
+            //call to the API to signup the user
+            register.mutate({
+                email: email,
+                username: username,
+                password: password
+            })
         }
-
-        //call to the API to signup the user
     }
 
     return(
@@ -33,7 +54,7 @@ export default function SignupPage() {
                     <CardTitle>Sign up</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={e => {e.preventDefault(); createAccount();}} >
+                    <form onSubmit={createAccount} >
                     <div className="flex flex-col gap-3">
                         <div className="grid gap-1">
                         <Input
@@ -75,14 +96,12 @@ export default function SignupPage() {
                             onChange={(e) => setPasswordConfirmation(e.target.value)}
                         />
                         </div>
+                        <Button variant="brownPrimary" type="submit" className="w-full">
+                            Create Account
+                        </Button>
                     </div>
                     </form>
                 </CardContent>
-                <CardFooter className="flex-col gap-2">
-                    <Button variant="brownPrimary" type="submit" className="w-full">
-                    Create Account
-                    </Button>
-                </CardFooter>
                 </Card>
                 
                 <div className='flex justify-center text-yellow-600 mt-6'>
