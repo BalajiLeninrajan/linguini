@@ -2,17 +2,36 @@
 import {useState, useEffect} from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter, CardContent } from '~/components/ui/card';
 import { Input } from "~/components/ui/input"
-import { Label } from '~/components/ui/label';
 import { Button } from '~/components/ui/button';
-import SignupPage from '../signup/page';
 import Link from 'next/link';
+import { api } from '~/trpc/react';
 
 export default function LoginPage() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    
+    const currentUser = api.auth.currentUser.useQuery(undefined, {
+        refetchOnWindowFocus: false,
+    });
 
-    const loginUser = () => {
+    const login = api.auth.login.useMutation({
+        onSuccess: async (data) => {
+            localStorage.setItem("token", data.token);
+            await currentUser.refetch();
+        },
+        onError: (error) => {
+            setError(error.message);
+        },
+    });
+
+    const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
         //call to the API to login the user
+        e.preventDefault();
+        login.mutate({
+            identifier: usernameOrEmail,
+            password: password,
+        })
     }
 
     return(
@@ -23,7 +42,7 @@ export default function LoginPage() {
                     <CardTitle>Welcome Back</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={e => {e.preventDefault(); loginUser();}}>
+                    <form onSubmit={loginUser}>
                     <div className="flex flex-col gap-3">
                         <div className="grid gap-1">
                         <Input
@@ -45,14 +64,12 @@ export default function LoginPage() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         </div>
+                        <Button variant="brownPrimary" type="submit" className="w-full">
+                        Log in
+                        </Button>
                     </div>
                     </form>
                 </CardContent>
-                <CardFooter className="flex-col gap-2">
-                    <Button variant="brownPrimary" type="submit" className="w-full">
-                    Log in
-                    </Button>
-                </CardFooter>
                 </Card>
                 
                 <div className='flex justify-center text-yellow-600 mt-6'>
