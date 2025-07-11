@@ -81,7 +81,7 @@ export default function LoginPage() {
                 
                 <div className='flex justify-center text-yellow-600 mt-6'>
                     <p className='text-2xl font-normal'>New around here? <span className='font-bold cursor-pointer'>
-                        <Link href='/signup'>Sign up</Link>
+                        <Link href='signup'>Sign up</Link>
                     </span></p>
                 </div>
             </div>

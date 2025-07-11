@@ -112,7 +112,7 @@ export default function SignupPage() {
                 
                 <div className='flex justify-center text-yellow-600 mt-6'>
                     <p className='text-2xl font-normal'>Not a newbie around here? <span className='font-bold cursor-pointer'>
-                        <Link href="/login">Log in</Link>
+                        <Link href="login">Log in</Link>
                     </span></p>
                 </div>
             </div>
