@@ -1,8 +1,9 @@
 'use client'
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import { Card, CardHeader, CardTitle} from '~/components/ui/card';
 import Link from 'next/link';
 import Header from '../_components/header';
+import LeaderboardContainer from '../_components/leaderboardContainer';
 
 export default function Leaderboard() {
     //hardcoding UI values for testing
@@ -48,19 +49,8 @@ export default function Leaderboard() {
                     <CardHeader>
                         <CardTitle className='text-yellow-600 text-5xl'>Global Leaderboard</CardTitle>
                     </CardHeader>
-            
-                    {users.map((value, key) => (
-                        <div key={key} className='flex flex-row justify-between w-full bg-white rounded-full px-4 py-4 -mb-2'>
-                            <div className='flex flex-row justify-between w-1/4'>
-                                <p className='text-yellow-600 text-xl font-bold'>{value.ranking}</p>
-                                <p className='ml-auto text-left w-1/2 text-xl text-gray-600'>{value.username}</p>
-                            </div>
-                            <div className='flex flex-row justify-between'>
-                                <p className='text-xl font-bold text-amber-700'>{value.categoryCount} ct.</p>
-                                <p className='ml-8 text-xl font-bold text-amber-700'>{value.time}s</p>
-                            </div>
-                        </div>
-                    ))}
+
+                    <LeaderboardContainer users={users}/>
 
 
                     </Card>
