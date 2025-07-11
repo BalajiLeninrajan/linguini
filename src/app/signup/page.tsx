@@ -1,10 +1,11 @@
 'use client'
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 import { Input } from "~/components/ui/input"
 import { Button } from '~/components/ui/button';
 import Link from 'next/link';
 import { api } from '~/trpc/react';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
     const [username, setUsername] = useState("");
@@ -33,16 +34,21 @@ export default function SignupPage() {
         e.preventDefault();
         
         if(passwordConfirmation != password){
-            alert("Your passwords do not match! Please try again.")
+            toast("Your passwords do not match! Please try again.");
             setPassword("");
             setPasswordConfirmation("");
         }else{
             //call to the API to signup the user
-            register.mutate({
-                email: email,
-                username: username,
-                password: password
-            })
+            try{
+                register.mutate({
+                    email: email,
+                    username: username,
+                    password: password
+                })
+            }catch(e){
+                toast("An error has occured, please try again!");
+                console.log(e);
+            }
         }
     }
 

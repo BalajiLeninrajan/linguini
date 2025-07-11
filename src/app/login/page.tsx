@@ -1,10 +1,12 @@
 'use client'
-import {useState, useEffect} from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardFooter, CardContent } from '~/components/ui/card';
+import {useState} from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 import { Input } from "~/components/ui/input"
 import { Button } from '~/components/ui/button';
 import Link from 'next/link';
 import { api } from '~/trpc/react';
+import { toast } from 'sonner';
+
 
 export default function LoginPage() {
     const [usernameOrEmail, setUsernameOrEmail] = useState("");
@@ -28,10 +30,15 @@ export default function LoginPage() {
     const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
         //call to the API to login the user
         e.preventDefault();
-        login.mutate({
-            identifier: usernameOrEmail,
-            password: password,
-        })
+        try{
+            login.mutate({
+                identifier: usernameOrEmail,
+                password: password,
+            })
+        }catch(e){
+            toast("An error has occured, please try again!");
+            console.log(e);
+        }
     }
 
     return(
