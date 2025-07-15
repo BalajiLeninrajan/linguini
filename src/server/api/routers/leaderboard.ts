@@ -59,5 +59,39 @@ export const leaderboardRouter = createTRPCRouter({
                     message: "An unexpected error occurred",
                 });
             }
+        }),
+
+    getMostRecentGame: publicProcedure
+        .query(async() => {
+            try{
+                const mostRecentGame: Pick<DBGame, "id">[] = await sql`
+                    SELECT id FROM games
+                    ORDER BY created_at DESC
+                    LIMIT 1;
+                `
+
+                console.log("here");
+                console.log(mostRecentGame[0])
+
+                if(!mostRecentGame[0]){
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message: "Most recent game not found",
+                    });
+                }
+
+                return mostRecentGame[0];
+
+            }catch(error){
+                if (error instanceof TRPCError) {
+                    throw error;
+                }
+
+                throw new TRPCError({
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "An unexpected error occurred",
+                });
+            }
         })
-});
+
+    });
