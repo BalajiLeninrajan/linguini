@@ -6,3 +6,9 @@ export type Group = DBGroup & {
   owner: User;
   members: User[];
 };
+
+export type Leader = {
+  username: string;
+  category_count: number;
+  time: Date;
+}
