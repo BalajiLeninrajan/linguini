@@ -29,5 +29,5 @@ jobs:
           echo "DATABASE_URL='postgres://postgres:postgres@db.localtest.me:5432/main'" >> .env
           echo "USE_LOCAL=true" >> .env
           echo "JWT_SECRET=dummysecret" >> .env
-      # - run: npm install
+      - run: npm install
       - run: npm run check
