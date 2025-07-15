@@ -29,8 +29,6 @@ export const leaderboardRouter = createTRPCRouter({
                     });
                 }
 
-                console.log("here!!")
-                console.log(checkGameResults[0]);
 
                 //select top 10 users
                 const getTop10Users = await sql`
