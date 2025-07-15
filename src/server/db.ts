@@ -116,3 +116,9 @@ export interface DBWordRequest {
   category: string;
   status: WordRequestStatus;
 }
+
+export interface LeaderboardUser {
+  username: string;
+  category_count: number;
+  time: number;
+}

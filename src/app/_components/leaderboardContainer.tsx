@@ -1,29 +1,34 @@
 'use client'
-
-interface User{
-    ranking: number,
-    username: string,
-    categoryCount: number,
-    time: number
-}
+import type { LeaderboardUser } from "~/server/db"
 
 interface UserProps{
-    users: User[]
+    users: LeaderboardUser[]
 }
 
 export default function LeaderboardContainer({users}: UserProps){
 
+    const formatTime = (time: any) => {
+        if (typeof time === 'number') {
+            return time;
+        }
+        if (typeof time === 'object' && time !== null) {
+            console.log(time)
+            return time.minutes;
+        }
+        return time;
+    };
+
     return(
         <>
-        {users.map((value:User, key:number) => (
+        {users.map((value:LeaderboardUser, key:number) => (
             <div key={key} className='flex flex-row justify-between w-full bg-white rounded-full px-4 py-4 -mb-2'>
                 <div className='flex flex-row justify-between w-1/4'>
-                    <p className='text-yellow-600 text-xl font-bold'>{value.ranking}</p>
+                    <p className='text-yellow-600 text-xl font-bold'>{key+1}</p>
                     <p className='ml-auto text-left w-1/2 text-xl text-gray-600'>{value.username}</p>
                 </div>
                 <div className='flex flex-row justify-between'>
-                    <p className='text-xl font-bold text-amber-700'>{value.categoryCount} ct.</p>
-                    <p className='ml-8 text-xl font-bold text-amber-700'>{value.time}s</p>
+                    <p className='text-xl font-bold text-amber-700'>{value.category_count} ct.</p>
+                    <p className='ml-8 text-xl font-bold text-amber-700'>{formatTime(value.time)}s</p>
                 </div>
             </div>
         ))}

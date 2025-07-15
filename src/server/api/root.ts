@@ -4,6 +4,7 @@ import { groupsRouter } from "~/server/api/routers/groups";
 import { usersRouter } from "~/server/api/routers/users";
 
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { leaderboardRouter } from "./routers/leaderboard";
 
 /**
  * This is the primary router for your server.
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   auth: authRouter,
   users: usersRouter,
   groups: groupsRouter,
+  leaderboard: leaderboardRouter,
 });
 
 // export type definition of API

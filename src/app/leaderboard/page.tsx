@@ -1,56 +1,47 @@
 'use client'
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import { Card, CardHeader, CardTitle} from '~/components/ui/card';
 import Link from 'next/link';
 import Header from '../_components/header';
 import LeaderboardContainer from '../_components/leaderboardContainer';
+import { api } from '~/trpc/react';
+import type { LeaderboardUser } from '~/server/db';
 
 export default function Leaderboard() {
-    //hardcoding UI values for testing
-    const [users, setUsers] = useState([
-            {
-                ranking: 1,
-                username: "Alex",
-                categoryCount: 3,
-                time: 53
-            },
-            {
-                ranking: 2,
-                username: "Julia",
-                categoryCount: 3,
-                time: 53
-            },
-            {
-                ranking: 3,
-                username: "Balaji",
-                categoryCount: 3,
-                time: 53
-            },
-            {
-                ranking: 4,
-                username: "Nicolas",
-                categoryCount: 3,
-                time: 53
-            },
-            {
-                ranking: 5,
-                username: "George",
-                categoryCount: 3,
-                time: 53
-            }
-        ]);
+
+    const [users, setUsers] = useState<LeaderboardUser[]>([]);
+    const [error, setError] = useState("");
+
+    const { data, isLoading, error: queryError } = api.leaderboard.getGlobalLeaderboard.useQuery({
+        gameId: '1',
+    });
+
+    useEffect(() => {
+        if (data) {
+            setUsers(data as LeaderboardUser[]);
+        }
+        if (queryError) {
+            setError(queryError.message);
+        }
+    }, [data, queryError]);
+
+
 
     return(
         <>
             <Header />
-            <div className='min-h-screen flex items-center justify-center bg-[#FFF1D4]'>
+            <div className='min-h-screen flex items-center justify-center bg-[#FFF1D4] py-28'>
                 <div className='w-1/3'>
                     <Card className="w-full">
                     <CardHeader>
                         <CardTitle className='text-yellow-600 text-5xl'>Global Leaderboard</CardTitle>
                     </CardHeader>
 
-                    <LeaderboardContainer users={users}/>
+                    {isLoading ? (
+                        <p>Loading...</p>
+                    ) : (
+                        <LeaderboardContainer users={users}/>
+                    )}
 
 
                     </Card>
