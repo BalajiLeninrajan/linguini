@@ -51,7 +51,7 @@ export default function Leaderboard() {
                     
                     <div className='flex justify-center text-yellow-600 mt-6'>
                         <p className='text-3xl font-light'>Checkout out <span className='font-bold cursor-pointer font-bold'>
-                            <Link href='/group-leaderboard'>Friend Leaderboard</Link>
+                            <Link href='leaderboard/group'>Friend Leaderboard</Link>
                         </span></p>
                     </div>
                 </div>

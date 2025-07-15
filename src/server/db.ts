@@ -122,3 +122,8 @@ export interface LeaderboardUser {
   category_count: number;
   time: number;
 }
+
+export interface userGroup{
+  id: string;
+  name: string;
+}
