@@ -12,8 +12,11 @@ export default function Leaderboard() {
     const [users, setUsers] = useState<LeaderboardUser[]>([]);
     const [error, setError] = useState("");
 
+    const {data: recentGame} = api.leaderboard.getMostRecentGame.useQuery();
+    const gameId = recentGame?.id?.toString() ?? "";
+
     const { data, isLoading, error: queryError } = api.leaderboard.getGlobalLeaderboard.useQuery({
-        gameId: '1',
+        gameId: gameId
     });
 
     useEffect(() => {
