@@ -119,7 +119,8 @@ export const leaderboardRouter = createTRPCRouter({
 
                 const groups = await sql `
                     SELECT DISTINCT groups.id, groups.name FROM
-                    groups JOIN group_users ON group_users.user_id=${userId}
+                    groups JOIN group_users ON group_users.group_id=groups.id
+                    WHERE group_users.user_id=${userId};
                 `
 
                 if(!groups){

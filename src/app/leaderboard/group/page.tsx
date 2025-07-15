@@ -15,7 +15,7 @@ export default function Leaderboard() {
     const [error, setError] = useState("");
     const [current, setCurrent] = useState("");
     //hard coded for now!!!
-    const currUserId = "1";
+    const currUserId = "7";
     const {data: recentGame} = api.leaderboard.getMostRecentGame.useQuery();
     const gameId = recentGame?.id?.toString() ?? "";
 
