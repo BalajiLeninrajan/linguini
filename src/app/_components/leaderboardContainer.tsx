@@ -1,5 +1,7 @@
 'use client'
+import type { Timestamp } from "next/dist/server/lib/cache-handlers/types";
 import type { LeaderboardUser } from "~/server/db"
+import type { TimeValue } from "~/types";
 
 interface UserProps{
     users: LeaderboardUser[]
@@ -7,7 +9,7 @@ interface UserProps{
 
 export default function LeaderboardContainer({users}: UserProps){
 
-    const formatTime = (time: any) => {
+    const formatTime = (time: TimeValue) => {
         if (typeof time === 'number') {
             return time;
         }

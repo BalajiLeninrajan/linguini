@@ -57,9 +57,7 @@ export default function Leaderboard() {
     }, [userGroups, queryError, currentGroup]);
 
     useEffect(() => {
-        if (localLeaderboard) {
-            setUsers(localLeaderboard as LeaderboardUser[]);
-        }
+        setUsers(localLeaderboard as LeaderboardUser[]);
         if (leaderboardError) {
             setError(leaderboardError.message);
         }

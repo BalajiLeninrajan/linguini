@@ -12,3 +12,5 @@ export type LeaderboardUser = {
   category_count: number;
   time: number;
 };
+
+export type TimeValue = number | { minutes: number } | null | undefined;
