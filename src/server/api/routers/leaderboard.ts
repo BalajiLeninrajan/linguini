@@ -1,13 +1,16 @@
 import { TRPCError } from "@trpc/server";
-import { create } from "domain";
-import { check } from "prettier";
-import { isReturnStatement } from "typescript";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
-import { sql, type DBGame, type DBGroup, type DBGroupUser, type DBUser } from "~/server/db";
-import type { Group, User } from "~/types";
+import { sql, type DBGame, type DBUser } from "~/server/db";
+import type { LeaderboardUser} from "~/types";
 
 export const leaderboardRouter = createTRPCRouter({
+   /**
+   * Creates a global leaderboard for all users based on the most recent game 
+   * @param gameId The ID of the game to fetch results for the leaderboard
+   * @returns Returns top 10 users and their results
+   * @throws {TRPCError} If leaderboard creation fails
+   */
     getGlobalLeaderboard: publicProcedure
         .input(
             z.object({
@@ -32,7 +35,7 @@ export const leaderboardRouter = createTRPCRouter({
 
 
                 //select top 10 users
-                const getTop10Users = await sql`
+                const getTop10Users: LeaderboardUser[] = await sql`
                     SELECT users.username, plays.category_count, (plays.end_time - plays.start_time) as time
                     FROM plays JOIN users ON users.id = plays.user_id
                     WHERE plays.game_id = ${gameId}
@@ -63,6 +66,11 @@ export const leaderboardRouter = createTRPCRouter({
         }),
 
     getMostRecentGame: publicProcedure
+         /**
+         * Outputs the most recent game 
+         * @returns Returns the ID of the most recent game
+         * @throws {TRPCError} If finding the most recent game fails
+         */
         .query(async() => {
             try{
                 const mostRecentGame: Pick<DBGame, "id">[] = await sql`
@@ -70,9 +78,6 @@ export const leaderboardRouter = createTRPCRouter({
                     ORDER BY created_at DESC
                     LIMIT 1;
                 `
-
-                console.log("here");
-                console.log(mostRecentGame[0])
 
                 if(!mostRecentGame[0]){
                     throw new TRPCError({
@@ -94,7 +99,8 @@ export const leaderboardRouter = createTRPCRouter({
                 });
             }
         }),
-
+    
+    //delete this procedure after rebase with main
     getUserGroups: publicProcedure
         .input(
             z.object({
@@ -144,6 +150,13 @@ export const leaderboardRouter = createTRPCRouter({
             }
         }),
 
+        /**
+         * Creates a local leaderboard for individual groups
+         * @param groupId The ID of the group for which we are creating a leaderboard
+         * @param gameId The ID of the game for which we are fetching user results
+         * @returns Returns rankings and results of all players in a specific group
+         * @throws {TRPCError} If creation of a local leaderboard fails
+         */
         getLocalLeaderboard: publicProcedure
             .input(
                 z.object({
@@ -154,7 +167,7 @@ export const leaderboardRouter = createTRPCRouter({
             .query(async ({input}) => {
                 const {groupId, gameId} = input;
                 try{
-                    const groupRankings = await sql`
+                    const groupRankings: LeaderboardUser[] = await sql`
                         SELECT DISTINCT users.username, plays.category_count, (plays.end_time - plays.start_time) as time FROM plays 
                         JOIN users ON users.id = plays.user_id
                         JOIN group_users ON group_users.user_id = users.id

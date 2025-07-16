@@ -7,8 +7,8 @@ export type Group = DBGroup & {
   members: User[];
 };
 
-export type Leader = {
+export type LeaderboardUser = {
   username: string;
   category_count: number;
-  time: Date;
-}
+  time: number;
+};

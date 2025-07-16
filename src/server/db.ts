@@ -123,6 +123,7 @@ export interface LeaderboardUser {
   time: number;
 }
 
+//delete after rebase with main
 export interface userGroup{
   id: string;
   name: string;
