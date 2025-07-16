@@ -7,6 +7,7 @@ import LeaderboardContainer from '~/app/_components/leaderboardContainer';
 import { api } from '~/trpc/react';
 import type { LeaderboardUser } from '~/server/db';
 import type { userGroup } from '~/server/db';
+import { useSearchParams } from 'next/navigation';
 
 export default function Leaderboard() {
 
@@ -15,15 +16,21 @@ export default function Leaderboard() {
     const [error, setError] = useState("");
     const [current, setCurrent] = useState("");
     //hard coded for now!!!
-    const currUserId = "7";
+    const currUserId = "1";
     const {data: recentGame} = api.leaderboard.getMostRecentGame.useQuery();
     const gameId = recentGame?.id?.toString() ?? "";
+    const searchParams = useSearchParams();
+    const groupId = searchParams.get('groupId')
+    const groupName = searchParams.get('groupName')
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
         { userId: currUserId }
     );
 
-    const currentGroup = (userGroups as userGroup[])?.[0];
+    const currentGroup = groupId && groupName ? {id: groupId, name: groupName} 
+    : (userGroups as userGroup[])?.[0];
+
+    console.log(currentGroup?.name)
    
     const { data: localLeaderboard, isLoading: isLoadingLeaderboard, error: leaderboardError } = api.leaderboard.getLocalLeaderboard.useQuery(
         {
@@ -36,14 +43,18 @@ export default function Leaderboard() {
     );
 
     useEffect(() => {
-        if (userGroups) {
+        if (userGroups && currentGroup) {
+            // Filter out the current group
+            console.log(typeof(userGroups))
+            console.log(userGroups)
+
             setUserGroups(userGroups as userGroup[]);
             setCurrent(currentGroup?.name?.toString() ?? "");
         }
         if (queryError) {
             setError(queryError.message);
         }
-    }, [userGroups, queryError]);
+    }, [userGroups, queryError, currentGroup]);
 
     useEffect(() => {
         if (localLeaderboard) {
@@ -75,7 +86,7 @@ export default function Leaderboard() {
                     <div className='absolute top-1/2 left-1/20 bg-[#F6CF81] p-6 rounded-3xl w-1/5'>
                         <p className='font-bold text-amber-900 text-2xl text-center mb-4'>Checkout Your <br></br> Other Groups</p>
                         {usergroups.map((value, key) => (
-                            <Link href='/' key={key}>
+                            <Link href={`/leaderboard/group?groupId=${value.id}&groupName=${value.name}`} key={key}>
                                 <div className='flex flex-row justify-between w-full bg-white rounded-full p-3 px-6 mb-2'>
                                     <span className='font-bold text-xl text-yellow-600'>{key+1}</span>
                                     <span className='text-xl text-gray-600'>{value.name}</span>
