@@ -72,38 +72,46 @@ export default function Leaderboard() {
             <Header />
             <div className='min-h-screen flex items-center justify-center bg-[#FFF1D4] py-28'>
                 <div className='w-1/3'>
-                    <Card className="w-full">
-                    <CardHeader>
-                        <CardTitle className='text-yellow-600 text-5xl'>{current}</CardTitle>
-                        <CardTitle className='text-yellow-600 text-3xl font-light'>Leaderboard</CardTitle>
-                    </CardHeader>
 
-                    {isLoadingLeaderboard ? (
-                        <p>Loading...</p>
+                    {/* someone fix pls */}
+                    {userGroups && userGroups as userGroup[] && (userGroups as userGroup[]).length() > 0 ? (
+                        <p>You're not a part of any groups yet :(</p>
                     ) : (
-                        <LeaderboardContainer users={users} />
+                        <>
+                            <Card className="w-full">
+                            <CardHeader>
+                                <CardTitle className='text-yellow-600 text-5xl'>{current}</CardTitle>
+                                <CardTitle className='text-yellow-600 text-3xl font-light'>Leaderboard</CardTitle>
+                            </CardHeader>
+
+                            {isLoadingLeaderboard ? (
+                                <p>Loading...</p>
+                            ) : (
+                                <LeaderboardContainer users={users} />
+                            )}
+
+                            </Card>
+
+                            <div className='absolute top-1/2 left-1/20 bg-[#F6CF81] p-6 rounded-3xl w-1/5'>
+                                <p className='font-bold text-amber-900 text-2xl text-center mb-4'>Checkout Your <br></br> Other Groups</p>
+
+                                {groupsLoading ? (
+                                    <p>Loading</p>
+                                ) : (
+                                    usergroups.map((value, key) => (
+                                        <Link href={`/leaderboard/group?groupId=${value.id}&groupName=${value.name}`} key={key}>
+                                            <div className='flex flex-row justify-between w-full bg-white rounded-full p-3 px-6 mb-2'>
+                                                <span className='font-bold text-xl text-yellow-600'>{key+1}</span>
+                                                <span className='text-xl text-gray-600'>{value.name}</span>
+                                            </div>
+                                        </Link>
+                                    ))
+                                )}
+
+                            </div>
+                        </>
                     )}
 
-
-                    </Card>
-                    
-                    <div className='absolute top-1/2 left-1/20 bg-[#F6CF81] p-6 rounded-3xl w-1/5'>
-                        <p className='font-bold text-amber-900 text-2xl text-center mb-4'>Checkout Your <br></br> Other Groups</p>
-
-                        {groupsLoading ? (
-                            <p>Loading</p>
-                        ) : (
-                            usergroups.map((value, key) => (
-                                <Link href={`/leaderboard/group?groupId=${value.id}&groupName=${value.name}`} key={key}>
-                                    <div className='flex flex-row justify-between w-full bg-white rounded-full p-3 px-6 mb-2'>
-                                        <span className='font-bold text-xl text-yellow-600'>{key+1}</span>
-                                        <span className='text-xl text-gray-600'>{value.name}</span>
-                                    </div>
-                                </Link>
-                            ))
-                        )}
-
-                    </div>
                     
                     <div className='flex justify-center text-yellow-600 mt-6'>
                         <p className='text-3xl font-light'>Checkout out <span className='font-bold cursor-pointer font-bold'>
