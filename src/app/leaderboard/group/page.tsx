@@ -15,13 +15,17 @@ export default function Leaderboard() {
     const [usergroups, setUserGroups] = useState<userGroup[]>([]);
     const [error, setError] = useState("");
     const [current, setCurrent] = useState("");
-    //hard coded for now!!!
-    const currUserId = "1";
     const {data: recentGame} = api.leaderboard.getMostRecentGame.useQuery();
     const gameId = recentGame?.id?.toString() ?? "";
     const searchParams = useSearchParams();
     const groupId = searchParams.get('groupId')
     const groupName = searchParams.get('groupName')
+
+    const currentUser = api.auth.currentUser.useQuery(undefined, {
+        refetchOnWindowFocus: false,
+    });
+    // const currUserId = currentUser?.id;
+    const currUserId = "1";
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
         { userId: currUserId }
