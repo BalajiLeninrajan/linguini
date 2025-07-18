@@ -9,7 +9,7 @@ import type { userGroup } from '~/server/db';
 import type { LeaderboardUser } from '~/types';
 import { useSearchParams } from 'next/navigation';
 
-export default function groupLeaderboardComponent() {
+export default function GroupLeaderboardComponent() {
 
     const [users, setUsers] = useState<LeaderboardUser[]>([]);
     const [usergroups, setUserGroups] = useState<userGroup[]>([]);
