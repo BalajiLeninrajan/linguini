@@ -15,7 +15,7 @@ function Card({ className, variant = "default", ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        "text-card-foreground flex flex-col gap-6 py-4 sm:py-6", // responsive vertical padding
+        "text-card-foreground flex flex-col gap-3 sm:gap-4 md:gap-6 py-2 sm:py-4 md:py-6 px-2 sm:px-4 md:px-6", 
         variantClass,
         className
       )}
@@ -74,7 +74,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-3 sm:px-6", className)} // responsive horizontal padding
+      className={cn("px-3 sm:px-6 space-y-3 sm:space-y-4 md:space-y-6", className)} // responsive horizontal padding and spacing
       {...props}
     />
   )
@@ -84,7 +84,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+      className={cn("flex items-center px-3 sm:px-6 [.border-t]:pt-4 sm:pt-6", className)}
       {...props}
     />
   )
