@@ -2,17 +2,21 @@ import * as React from "react"
 
 import { cn } from "~/lib/utils"
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+interface CardProps extends React.ComponentProps<"div"> {
+  variant?: "default" | "yellow";
+}
+
+function Card({ className, variant = "default", ...props }: CardProps) {
+  const variantClass =
+    variant === "yellow"
+      ? "bg-[#F6CF81] rounded-xl"
+      : "";
   return (
     <div
       data-slot="card"
       className={cn(
-<<<<<<< HEAD
-        "text-card-foreground flex flex-col gap-6 py-6",
-=======
         "text-card-foreground flex flex-col gap-6 py-4 sm:py-6", // responsive vertical padding
         variantClass,
->>>>>>> fe6c17c (feedback implemented)
         className
       )}
       {...props}
