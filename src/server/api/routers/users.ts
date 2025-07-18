@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { sql, type DBGroupUser } from "~/server/db";
 import type { User } from "~/types";
 
@@ -169,7 +169,7 @@ export const usersRouter = createTRPCRouter({
    * @returns Array of group IDs the user is a member of
    * @throws {TRPCError} If query fails
    */
-  getGroupMembershipsById: protectedProcedure
+  getGroupMembershipsById: publicProcedure
     .input(
       z.object({
         userId: z.number().nonnegative(),

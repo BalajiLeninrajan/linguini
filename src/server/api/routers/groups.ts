@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { sql, type DBGroup, type DBGroupUser } from "~/server/db";
 import type { Group, User } from "~/types";
 
@@ -291,7 +291,7 @@ export const groupsRouter = createTRPCRouter({
    * @returns Group details including owner and member information
    * @throws {TRPCError} If group not found
    */
-  getGroupFromId: protectedProcedure
+  getGroupFromId: publicProcedure
     .input(
       z.object({
         groupId: z.number(),
