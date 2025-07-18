@@ -141,7 +141,7 @@ export const playRouter = createTRPCRouter({
     }))
     .query(async ({ input }) => {
         const { groupId, userId } = input;
-        return playExists(groupId, userId);
+        return await playExists(groupId, userId);
     }),
 
 
@@ -163,6 +163,6 @@ export const playRouter = createTRPCRouter({
     }))
     .mutation(async ({ input }) => {
         const { groupId, userId, categoryCount, endTime } = input;
-        return endPlay(groupId, userId, categoryCount, endTime);
+        return await endPlay(groupId, userId, categoryCount, endTime);
     }),
 })
