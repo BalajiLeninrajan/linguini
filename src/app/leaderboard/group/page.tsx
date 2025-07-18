@@ -25,11 +25,12 @@ export default function Leaderboard() {
         refetchOnWindowFocus: false,
     });
     // const currUserId = currentUser?.id;
-    const currUserId = "11";
+    const currUserId = "1";
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
         { userId: currUserId }
     );
+
 
     const currentGroup = groupId && groupName ? {id: groupId, name: groupName} 
     : userGroups && userGroups.length > 0 ?(userGroups as userGroup[])?.[0]
@@ -57,9 +58,7 @@ export default function Leaderboard() {
     }, [userGroups, queryError, currentGroup]);
 
     useEffect(() => {
-        if(localLeaderboard){
-            setUsers(localLeaderboard as LeaderboardUser[]);
-        }
+        setUsers(localLeaderboard as LeaderboardUser[]);
         if (leaderboardError) {
             setError(leaderboardError.message);
         }
