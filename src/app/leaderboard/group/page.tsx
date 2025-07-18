@@ -57,9 +57,7 @@ export default function Leaderboard() {
     }, [userGroups, queryError, currentGroup]);
 
     useEffect(() => {
-        if (localLeaderboard) {
-            setUsers(localLeaderboard as LeaderboardUser[]);
-        }
+        setUsers(localLeaderboard as LeaderboardUser[]);
         if (leaderboardError) {
             setError(leaderboardError.message);
         }
@@ -74,7 +72,7 @@ export default function Leaderboard() {
                 <div className='w-1/3'>
 
                     {userGroups && userGroups.length == 0 ? (
-                        <p>You're not a part of any groups yet :(</p>
+                        <p>You are not a part of any groups yet :(</p>
                     ) : (
                         <>
                             <Card className="w-full">
