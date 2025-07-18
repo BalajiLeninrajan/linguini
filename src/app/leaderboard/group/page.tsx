@@ -25,7 +25,7 @@ export default function Leaderboard() {
         refetchOnWindowFocus: false,
     });
     // const currUserId = currentUser?.id;
-    const currUserId = "1";
+    const currUserId = "11";
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
         { userId: currUserId }
@@ -59,7 +59,7 @@ export default function Leaderboard() {
 
     useEffect(() => {
         if(localLeaderboard){
-            setUsers(localLeaderboard as LeaderboardUser[]);
+            setUsers(localLeaderboard);
         }
         if (leaderboardError) {
             setError(leaderboardError.message);
