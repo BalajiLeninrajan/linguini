@@ -16,7 +16,7 @@ export default function GroupCreationPage() {
           <Card variant="yellow" className="w-full p-12 min-h-[500px] relative">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold" style={{ color: '#7C4A12' }}>
-                Patrick's New Group
+                Patricks New Group
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 flex flex-col flex-1 pb-16">
