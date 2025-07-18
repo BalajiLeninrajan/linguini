@@ -8,6 +8,7 @@ import { api } from '~/trpc/react';
 import type { userGroup } from '~/server/db';
 import type { LeaderboardUser } from '~/types';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 export default function Leaderboard() {
 
@@ -25,7 +26,7 @@ export default function Leaderboard() {
         refetchOnWindowFocus: false,
     });
     // const currUserId = currentUser?.id;
-    const currUserId = "11";
+    const currUserId = "1";
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
         { userId: currUserId }
@@ -74,6 +75,7 @@ export default function Leaderboard() {
             <div className='min-h-screen flex items-center justify-center bg-[#FFF1D4] py-28'>
                 <div className='w-1/3'>
 
+                <Suspense fallback={<div>Loading...</div>}>
                     {userGroups && userGroups.length == 0 ? (
                         <p>You are not a part of any groups yet :(</p>
                     ) : (
@@ -89,6 +91,7 @@ export default function Leaderboard() {
                             ) : users ? (
                                  <LeaderboardContainer users={users} />
                             ) : null}
+
 
                             </Card>
 
@@ -111,6 +114,7 @@ export default function Leaderboard() {
                             </div>
                         </>
                     )}
+                </Suspense>
 
                     
                     <div className='flex justify-center text-yellow-600 mt-6'>
