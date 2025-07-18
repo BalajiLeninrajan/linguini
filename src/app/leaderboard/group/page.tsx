@@ -25,16 +25,16 @@ export default function Leaderboard() {
         refetchOnWindowFocus: false,
     });
     // const currUserId = currentUser?.id;
-    const currUserId = "1";
+    const currUserId = "11";
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
         { userId: currUserId }
     );
 
     const currentGroup = groupId && groupName ? {id: groupId, name: groupName} 
-    : (userGroups as userGroup[])?.[0];
+    : userGroups && userGroups.length > 0 ?(userGroups as userGroup[])?.[0]
+    : null;
 
-    console.log(currentGroup?.name)
    
     const { data: localLeaderboard, isLoading: isLoadingLeaderboard, error: leaderboardError } = api.leaderboard.getLocalLeaderboard.useQuery(
         {
@@ -42,13 +42,13 @@ export default function Leaderboard() {
             gameId: gameId
         },
         {
-            enabled: !!currentGroup?.id && !!gameId
+            enabled: !!currentGroup && !!gameId 
         }
     );
 
     useEffect(() => {
         if (userGroups && currentGroup) {
-            setUserGroups(userGroups as userGroup[]);
+            setUserGroups(userGroups);
             setCurrent(currentGroup?.name?.toString() ?? "");
         }
         if (queryError) {
@@ -57,7 +57,9 @@ export default function Leaderboard() {
     }, [userGroups, queryError, currentGroup]);
 
     useEffect(() => {
-        setUsers(localLeaderboard as LeaderboardUser[]);
+        if(localLeaderboard){
+            setUsers(localLeaderboard as LeaderboardUser[]);
+        }
         if (leaderboardError) {
             setError(leaderboardError.message);
         }
@@ -83,9 +85,9 @@ export default function Leaderboard() {
 
                             {isLoadingLeaderboard ? (
                                 <p>Loading...</p>
-                            ) : (
-                                <LeaderboardContainer users={users} />
-                            )}
+                            ) : users ? (
+                                 <LeaderboardContainer users={users} />
+                            ) : null}
 
                             </Card>
 
@@ -93,7 +95,7 @@ export default function Leaderboard() {
                                 <p className='font-bold text-amber-900 text-2xl text-center mb-4'>Checkout Your <br></br> Other Groups</p>
 
                                 {groupsLoading ? (
-                                    <p>Loading</p>
+                                    <p>Loading...</p>
                                 ) : (
                                     usergroups.map((value, key) => (
                                         <Link href={`/leaderboard/group?groupId=${value.id}&groupName=${value.name}`} key={key}>
