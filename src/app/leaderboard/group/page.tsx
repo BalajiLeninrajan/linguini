@@ -73,8 +73,7 @@ export default function Leaderboard() {
             <div className='min-h-screen flex items-center justify-center bg-[#FFF1D4] py-28'>
                 <div className='w-1/3'>
 
-                    {/* someone fix pls */}
-                    {userGroups && userGroups.length > 0 ? (
+                    {userGroups && userGroups.length == 0 ? (
                         <p>You're not a part of any groups yet :(</p>
                     ) : (
                         <>
