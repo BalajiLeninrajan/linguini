@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { sql, type DBGame, type DBUser } from "~/server/db";
-import type { LeaderboardUser} from "~/types";
+import type { LeaderboardUser, userGroup} from "~/types";
 
 export const leaderboardRouter = createTRPCRouter({
    /**
@@ -123,7 +123,7 @@ export const leaderboardRouter = createTRPCRouter({
                     });
                 }
 
-                const groups = await sql `
+                const groups: userGroup[] = await sql `
                     SELECT DISTINCT groups.id, groups.name FROM
                     groups JOIN group_users ON group_users.group_id=groups.id
                     WHERE group_users.user_id=${userId};

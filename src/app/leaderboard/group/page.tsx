@@ -74,7 +74,7 @@ export default function Leaderboard() {
                 <div className='w-1/3'>
 
                     {/* someone fix pls */}
-                    {userGroups && userGroups as userGroup[] && (userGroups as userGroup[]).length() > 0 ? (
+                    {userGroups && userGroups.length > 0 ? (
                         <p>You're not a part of any groups yet :(</p>
                     ) : (
                         <>
