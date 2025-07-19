@@ -4,11 +4,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import Header from "./header";
-import { useSearchParams , useRouter } from 'next/navigation';
+import { useSearchParams  } from 'next/navigation';
 import { api } from "~/trpc/react";
 import { type User } from "~/types";
 import Link from 'next/link';
 import Image from "next/image";
+import { toast } from "sonner";
+import Alert from "../_components/alertComponent";
 
 export default function GroupUpdateComponent() {
     const [newGroupName, setNewGroupName] = useState("");
@@ -16,6 +18,8 @@ export default function GroupUpdateComponent() {
     const [groupMembers, setGroupMembers] = useState<User[]>([]);
     const [username, setuserName] = useState("");
     const [newMember, setNewMember] = useState("");
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertContent, setAlertContent] = useState("");
     const searchParams = useSearchParams();
     const groupId = searchParams.get('groupId')
 
@@ -79,17 +83,21 @@ export default function GroupUpdateComponent() {
           }
         }catch(error){
             console.log(error);
+            toast("Something went wrong, please try again.");
         }
     }
 
-    const removeMember = (memberId: number) => {
+    const removeMember = (memberId: number, username: string) => {
       try{
+        setAlertContent(`You are about to remove ${username} from ${currGroupName}`);
+        setShowAlert(true);
         removeMemberHook({
           groupId: Number(groupId),
           userId: memberId,
         })
       }catch(error){
         console.log(error);
+        toast("Something went wrong, please try again.");
       }
     }
 
@@ -132,8 +140,7 @@ export default function GroupUpdateComponent() {
                       {groupMembers.map((value, key) => (
                         <div key={key} className="bg-white p-2 px-4 rounded-full w-1/2 flex justify-between">
                           <h4>{value.username}</h4>
-                          <Image src='/close.svg' alt='close' width={15} height={15} className="cursor-pointer" onClick={() => removeMember(value.id)}/>
-                          {/* <h4 className="cursor-pointer" onClick={() => removeMember(value.id)}>x</h4> */}
+                          <Image src='/close.svg' alt='close' width={15} height={15} className="cursor-pointer" onClick={() => removeMember(value.id, value.username)}/>
                         </div>
                       ))}
                     </>
@@ -162,6 +169,15 @@ export default function GroupUpdateComponent() {
           <p>Loading...</p>
         )}
       </div>
+
+        <Alert
+            open={showAlert}
+            onOpenChange={setShowAlert}
+            body={alertContent}
+            onConfirm={() => {
+            setShowAlert(false);
+            }}
+        />
     </>
   );
 }
