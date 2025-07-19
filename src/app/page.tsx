@@ -47,7 +47,7 @@ export default async function Home() {
           </div>
 
           <LatestPost />
-          <WordCategoryTester/>
+          <WordCategoryTester />
         </div>
       </main>
     </HydrateClient>

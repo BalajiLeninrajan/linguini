@@ -14,10 +14,11 @@ export function WordCategoryTester() {
 
   const createQuery = api.wordCategories.verify.useQuery(
     { word, category },
-    { enabled: false } // disable auto-run
+    { enabled: false }, // disable auto-run
   );
 
-  const generateMutation = api.wordCategories.generateCategoriesList.useMutation();
+  const generateMutation =
+    api.wordCategories.generateCategoriesList.useMutation();
 
   const handleCheckMatch = async () => {
     try {
@@ -40,31 +41,31 @@ export function WordCategoryTester() {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-4 space-y-6">
+    <div className="mx-auto max-w-xl space-y-6 p-4">
       <h2 className="text-2xl font-semibold">Word Category Tester</h2>
 
       <div className="space-y-2">
         <input
-          className="border p-2 w-full"
+          className="w-full border p-2"
           type="text"
           placeholder="Enter word"
           value={word}
           onChange={(e) => setWord(e.target.value)}
         />
         <input
-          className="border p-2 w-full"
+          className="w-full border p-2"
           type="text"
           placeholder="Enter category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         />
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="rounded bg-blue-500 px-4 py-2 text-white"
           onClick={handleCheckMatch}
         >
           Check Match
         </button>
-        {result && <p className="text-lg mt-2">{result}</p>}
+        {result && <p className="mt-2 text-lg">{result}</p>}
       </div>
 
       <hr />
@@ -72,7 +73,7 @@ export function WordCategoryTester() {
       <div className="space-y-2">
         <label className="block font-medium">Seed (between 0 and 1)</label>
         <input
-          className="border p-2 w-full"
+          className="w-full border p-2"
           type="number"
           step="0.01"
           min="0.01"
@@ -81,12 +82,12 @@ export function WordCategoryTester() {
           onChange={(e) => setSeed(Number(e.target.value))}
         />
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="rounded bg-green-500 px-4 py-2 text-white"
           onClick={handleGenerateCategories}
         >
           Generate Categories
         </button>
-        <ul className="list-disc ml-6 mt-2">
+        <ul className="mt-2 ml-6 list-disc">
           {categories.map((cat, idx) => (
             <li key={idx}>{cat}</li>
           ))}
