@@ -18,7 +18,7 @@ export default function GroupCreationPage() {
   
   const userId = currentUser.data?.id;
   const userInfo = api.users.getById.useQuery(
-    {userId: userId || -1}
+    {userId: userId ?? -1}
   )
 
   const { mutate: createNewGroup } = api.groups.create.useMutation({
@@ -55,7 +55,7 @@ export default function GroupCreationPage() {
             <Card variant="yellow" className="w-full p-2 sm:p-4 md:p-8 min-h-[200px] sm:min-h-[300px] md:min-h-[400px] relative">
               <CardHeader className="text-center">
                 <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-900">
-                  {username}'s New Group
+                  {username}&apos;s New Group
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 sm:space-y-6 flex flex-col flex-1 pb-12 sm:pb-16">

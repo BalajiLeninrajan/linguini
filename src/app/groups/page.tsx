@@ -18,7 +18,7 @@ export default function GroupsPage() {
   const userId = currentUser.data?.id;
 
   const groupIDs = api.users.getGroupMembershipsById.useQuery(
-    {userId: userId || -1}
+    {userId: userId ?? -1}
   )
 
   const trpcContext = api.useUtils();
