@@ -38,7 +38,6 @@ export default function GroupCreationPage() {
 
   const createGroup = () => {
     try{
-      console.log(groupName)
       createNewGroup({
         name: groupName,
       })

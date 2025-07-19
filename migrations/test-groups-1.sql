@@ -18,9 +18,9 @@
 -- (11, 9, false),
 -- (11, 10, false);
 
-INSERT INTO group_users (group_id, user_id, is_owner) VALUES
-(12, 12, false),
-(11, 12, false);
+-- INSERT INTO group_users (group_id, user_id, is_owner) VALUES
+-- (12, 12, false),
+-- (11, 12, false);
 
 -- UPDATE group_users
 -- SET user_id = 2
@@ -33,3 +33,10 @@ INSERT INTO group_users (group_id, user_id, is_owner) VALUES
 -- UPDATE group_users
 -- SET user_id = 4
 -- WHERE user_id = 12 and group_id = 12;
+
+INSERT INTO group_users (group_id, user_id, is_owner) VALUES
+(15, 1, false),
+(15, 2, false),
+(15, 3, false),
+(15, 4, false),
+(15, 5, false);
