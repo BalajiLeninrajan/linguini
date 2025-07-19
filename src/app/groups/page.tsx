@@ -1,122 +1,172 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import Header from "../_components/header";
 import { GroupName } from "~/components/ui/group-name";
 import { api } from "~/trpc/react";
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function GroupsPage() {
-
-  const [groups, setGroups] = useState<{ id: number, name: string; canEdit: boolean }[]>([]);
-
   const currentUser = api.auth.currentUser.useQuery(undefined, {
-      refetchOnWindowFocus: false,
-  })
+    refetchOnWindowFocus: false,
+  });
 
   const userId = currentUser.data?.id;
 
-  const groupIDs = api.users.getGroupMembershipsById.useQuery(
-    {userId: userId || -1}
-  )
+  const groupMemberships = api.users.getGroupMembershipsById.useQuery(
+    { userId: userId ?? -1 },
+    { enabled: !!userId },
+  );
 
-  const trpcContext = api.useUtils();
+  const groupIds =
+    groupMemberships.data?.map((membership) => membership.group_id) ?? [];
 
-  const { mutate: deleteGroupHook } = api.groups.delete.useMutation();
-  const { mutate: leaveGroupHook} = api.groups.leaveGroup.useMutation();
+  const groupQueries = api.useQueries((t) =>
+    groupIds.map((groupId) =>
+      t.groups.getGroupFromId({ groupId }, { enabled: groupIds.length > 0 }),
+    ),
+  );
 
-   useEffect(() => {
-    const fetchGroupInfo = async () => {
-      if (!groupIDs.data) return;
+  const { mutate: deleteGroupHook } = api.groups.delete.useMutation({
+    onSuccess: () => {
+      void groupMemberships.refetch();
+    },
+  });
 
-      const results = await Promise.all(
-        groupIDs.data.map((group) =>
-          trpcContext.groups.getGroupFromId.fetch({ groupId: group.group_id })
-        )
-      );
+  const { mutate: leaveGroupHook } = api.groups.leaveGroup.useMutation({
+    onSuccess: () => {
+      void groupMemberships.refetch();
+    },
+  });
 
-      const trimmedResults = results.map(group => ({
-        id: group.id,
-        name: group.name,
-        canEdit: group.owner.id == userId
-      }))
+  const deleteGroup = (groupId: number) => {
+    deleteGroupHook({ groupId });
+  };
 
-      setGroups(trimmedResults);
+  const leaveGroup = (groupId: number) => {
+    leaveGroupHook({ groupId });
+  };
 
-      console.log(trimmedResults);
-    };
+  const isLoading =
+    currentUser.isLoading ||
+    groupMemberships.isLoading ||
+    groupQueries.some((q) => q.isLoading);
+  const hasError =
+    currentUser.error ??
+    groupMemberships.error ??
+    groupQueries.some((q) => q.error);
 
-    fetchGroupInfo();
-  }, [groupIDs]);
+  const groups = groupQueries
+    .filter((query) => query.data)
+    .map((query) => ({
+      id: query.data!.id,
+      name: query.data!.name,
+      canEdit: query.data!.owner.id === userId,
+    }));
 
-  const deleteGroup = async (groupId: number) => {
-    try{
-      deleteGroupHook({
-        groupId: groupId,
-      })
-      await groupIDs.refetch();
-
-    }catch(error){
-      console.log(error);
-    }
+  if (hasError) {
+    return (
+      <>
+        <Header />
+        <div className="flex min-h-screen items-center justify-center bg-[#FFF1D4]">
+          <div className="flex w-full max-w-3xl flex-col items-center">
+            <Card className="w-full">
+              <CardContent>
+                <p className="text-red-600">
+                  Error loading groups. Please try again.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </>
+    );
   }
-
-  const leaveGroup = async (groupId: number) => {
-    try{
-      leaveGroupHook({
-        groupId: groupId,
-      })
-      await groupIDs.refetch();
-
-    }catch(error){
-      console.log(error);
-    }
-  }
-
 
   return (
     <>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-[#FFF1D4]">
-        <div className="w-full max-w-3xl flex flex-col items-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#FFF1D4]">
+        <div className="flex w-full max-w-3xl flex-col items-center">
           <Card className="w-full">
             <CardHeader>
-              <CardTitle className='text-yellow-600 text-5xl'>My Groups</CardTitle>
+              <CardTitle className="text-5xl text-yellow-600">
+                My Groups
+              </CardTitle>
             </CardHeader>
 
-            {groups && groups.length > 0 ? (
+            {isLoading ? (
               <CardContent>
-                <div className="flex flex-col gap-2 mb-6">
-                  {groups.map((group, idx) => (
-                    <div key={group.name} className="flex items-center justify-between bg-white rounded-full px-4 py-3 min-h-14 w-full">
+                <p>Loading...</p>
+              </CardContent>
+            ) : groups.length > 0 ? (
+              <CardContent>
+                <div className="mb-6 flex flex-col gap-2">
+                  {groups.map((group) => (
+                    <div
+                      key={group.id}
+                      className="flex min-h-14 w-full items-center justify-between rounded-full bg-white px-4 py-3"
+                    >
                       <GroupName name={group.name} />
-                      <div className="flex flex-shrink-0 justify-end space-x-1 md:space-x-2 w-auto md:w-96 flex-wrap">
+                      <div className="flex w-auto flex-shrink-0 flex-wrap justify-end space-x-1 md:w-96 md:space-x-2">
                         {group.canEdit && (
-                          <Link href={`/groups/change_group_name?groupId=${group.id}`}>
-                              <Button variant="edit" className="h-10 px-6 rounded-full">Edit</Button>
+                          <Link
+                            href={`/groups/change_group_name?groupId=${group.id}`}
+                          >
+                            <Button
+                              variant="edit"
+                              className="h-10 rounded-full px-6"
+                            >
+                              Edit
+                            </Button>
                           </Link>
                         )}
-                        <Link href={`/leaderboard/group?groupId=${group.id}&groupName=${group.name}`} >
-                          <Button variant="leaderboard" className="h-10 px-6 rounded-full">Leaderboard</Button>
+                        <Link
+                          href={`/leaderboard/group?groupId=${group.id}&groupName=${group.name}`}
+                        >
+                          <Button
+                            variant="leaderboard"
+                            className="h-10 rounded-full px-6"
+                          >
+                            Leaderboard
+                          </Button>
                         </Link>
-                        <Button variant="danger" className="h-10 px-6 rounded-full" onClick={group.canEdit ? () => {deleteGroup(group.id)} : () => {leaveGroup(group.id)}}>
-                          {group.canEdit ? "Delete" : "Leave"}</Button>
+                        <Button
+                          variant="danger"
+                          className="h-10 rounded-full px-6"
+                          onClick={() =>
+                            group.canEdit
+                              ? deleteGroup(group.id)
+                              : leaveGroup(group.id)
+                          }
+                        >
+                          {group.canEdit ? "Delete" : "Leave"}
+                        </Button>
                       </div>
                     </div>
                   ))}
                 </div>
-                <Button variant="default" className="w-full text-base sm:text-lg font-bold h-16">Create Group</Button>
-            </CardContent>
+                <Button
+                  variant="default"
+                  className="h-16 w-full text-base font-bold sm:text-lg"
+                >
+                  Create Group
+                </Button>
+              </CardContent>
             ) : (
-              <p>Loading...</p>
+              <CardContent>
+                <p>No groups found.</p>
+                <Button
+                  variant="default"
+                  className="mt-4 h-16 w-full text-base font-bold sm:text-lg"
+                >
+                  Create Group
+                </Button>
+              </CardContent>
             )}
-
           </Card>
         </div>
       </div>
     </>
   );
 }
-
-
