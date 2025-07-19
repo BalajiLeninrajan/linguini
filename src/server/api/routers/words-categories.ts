@@ -49,30 +49,17 @@ export const wordsCategoriesRouter = createTRPCRouter({
 
   /**
    * Generate category list from the seed
-   * @param seed The seed for today's puzzle. Assuming the seed is between 0 and 1
    * @throws {TRPCError} If something goes wrong
    */
   generateCategoriesList: publicProcedure
-    .input(
-      z.object({
-        seed: z.number().gt(0).lt(1),
-      }),
-    )
-    .mutation(async ({ input }): Promise<DBCategory[]> => {
-      const { seed } = input;
-
+    .query(async (): Promise<DBCategory[]> => {
       try {
-        await sql`BEGIN`;
-
-        await sql`SELECT SETSEED(${seed})`;
-
-        const response: DBCategory[] = await sql`
-                SELECT category
-                FROM categories
-                ORDER BY RANDOM();
-            `;
-        await sql`COMMIT`;
-        return response;
+        const categoriesList: DBCategory[] = await sql`
+            SELECT category
+            FROM categories
+            ORDER BY RANDOM();
+        `;
+        return categoriesList;
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;

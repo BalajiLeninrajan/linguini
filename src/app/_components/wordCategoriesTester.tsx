@@ -18,7 +18,7 @@ export function WordCategoryTester() {
   );
 
   const generateMutation =
-    api.wordCategories.generateCategoriesList.useMutation();
+    api.wordCategories.generateCategoriesList.useQuery();
 
   const handleCheckMatch = async () => {
     try {
@@ -32,7 +32,7 @@ export function WordCategoryTester() {
 
   const handleGenerateCategories = async () => {
     try {
-      const res = await generateMutation.mutateAsync({ seed });
+      const res = await generateMutation.data ?? [];
       setCategories(res.map((c) => c.category));
     } catch (err) {
       console.error(err);
@@ -71,16 +71,6 @@ export function WordCategoryTester() {
       <hr />
 
       <div className="space-y-2">
-        <label className="block font-medium">Seed (between 0 and 1)</label>
-        <input
-          className="w-full border p-2"
-          type="number"
-          step="0.01"
-          min="0.01"
-          max="0.99"
-          value={seed}
-          onChange={(e) => setSeed(Number(e.target.value))}
-        />
         <button
           className="rounded bg-green-500 px-4 py-2 text-white"
           onClick={handleGenerateCategories}
