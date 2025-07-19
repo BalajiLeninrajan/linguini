@@ -6,7 +6,6 @@ import Header from "../_components/header";
 import { GroupName } from "~/components/ui/group-name";
 import { api } from "~/trpc/react";
 import Link from 'next/link';
-import { group } from "node:console";
 
 export default function GroupsPage() {
 
@@ -126,7 +125,9 @@ export default function GroupsPage() {
                     </div>
                   ))}
                 </div>
-                <Button variant="default" className="w-full text-base sm:text-lg font-bold h-16">Create Group</Button>
+                <Link href="/groups/group_creation">
+                  <Button variant="default" className="w-full text-base sm:text-lg font-bold h-16" >Create Group</Button>
+                </Link>
             </CardContent>
             ) : groupIDs.data && groupIDs.data.length == 0 ?(
               <CardContent>

@@ -104,7 +104,7 @@ export const leaderboardRouter = createTRPCRouter({
     getUserGroups: publicProcedure
         .input(
             z.object({
-                userId: z.string(),
+                userId: z.number(),
             })
         )
         .query(async ({input}) => {
