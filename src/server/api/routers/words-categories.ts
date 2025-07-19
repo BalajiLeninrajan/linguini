@@ -51,8 +51,8 @@ export const wordsCategoriesRouter = createTRPCRouter({
    * Generate category list from the seed
    * @throws {TRPCError} If something goes wrong
    */
-  generateCategoriesList: publicProcedure
-    .query(async (): Promise<DBCategory[]> => {
+  generateCategoriesList: publicProcedure.query(
+    async (): Promise<DBCategory[]> => {
       try {
         const categoriesList: DBCategory[] = await sql`
             SELECT category
@@ -70,5 +70,6 @@ export const wordsCategoriesRouter = createTRPCRouter({
           message: "An unexpected error occurred",
         });
       }
-    }),
+    },
+  ),
 });

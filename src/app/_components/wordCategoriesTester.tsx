@@ -7,7 +7,6 @@ import { api } from "~/trpc/react"; // adjust to your client path
 export function WordCategoryTester() {
   const [word, setWord] = useState("");
   const [category, setCategory] = useState("");
-  const [seed, setSeed] = useState(0.5);
 
   const [result, setResult] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
@@ -17,8 +16,7 @@ export function WordCategoryTester() {
     { enabled: false }, // disable auto-run
   );
 
-  const generateMutation =
-    api.wordCategories.generateCategoriesList.useQuery();
+  const generateMutation = api.wordCategories.generateCategoriesList.useQuery();
 
   const handleCheckMatch = async () => {
     try {
@@ -32,7 +30,7 @@ export function WordCategoryTester() {
 
   const handleGenerateCategories = async () => {
     try {
-      const res = await generateMutation.data ?? [];
+      const res = generateMutation.data ?? [];
       setCategories(res.map((c) => c.category));
     } catch (err) {
       console.error(err);
