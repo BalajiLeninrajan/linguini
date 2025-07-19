@@ -63,7 +63,7 @@ export default function GroupsPage() {
       console.log(trimmedResults);
     };
 
-    fetchGroupInfo();
+    void fetchGroupInfo();
   }, [groupIDs.data, userId]); 
 
   const deleteGroup = (groupId: number) => {
