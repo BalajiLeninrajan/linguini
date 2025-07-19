@@ -24,6 +24,7 @@ export default function LoginPage() {
         },
         onError: (error) => {
             setError(error.message);
+            toast("An error has occured, please try again!");
         },
     });
 

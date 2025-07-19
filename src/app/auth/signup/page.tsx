@@ -25,6 +25,7 @@ export default function SignupPage() {
         },
         onError: (error) => {
             setError(error.message);
+            toast("An error has occured, please try again!");
         },
     });
 
