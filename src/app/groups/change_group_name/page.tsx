@@ -17,7 +17,6 @@ export default function GroupNameUpdatePage() {
     const [newMember, setNewMember] = useState("");
     const searchParams = useSearchParams();
     const groupId = searchParams.get('groupId')
-    const router = useRouter();
 
     const currentUser = api.auth.currentUser.useQuery(undefined, {
         refetchOnWindowFocus: false,
