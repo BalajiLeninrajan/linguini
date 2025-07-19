@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LatestPost } from "~/app/_components/post";
+import { WordCategoryTester } from "~/app/_components/wordCategoriesTester"; // TODO: Vibe coded, can delete
 import { api, HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
@@ -46,6 +47,7 @@ export default async function Home() {
           </div>
 
           <LatestPost />
+          <WordCategoryTester/>
         </div>
       </main>
     </HydrateClient>

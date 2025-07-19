@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { sql, type DBWordCategory, type DBCategory } from "../../db";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { sql, type DBWordCategory, type DBCategory } from "~/server/db";
 
 
 export const wordsCategoriesRouter = createTRPCRouter({
@@ -11,7 +11,7 @@ export const wordsCategoriesRouter = createTRPCRouter({
    * @param category The category that was provided
    * @throws {TRPCError} If something goes wrong
    */
-    create: publicProcedure.input(
+    verify: publicProcedure.input(
         z.object({
             word: z.string().min(1, "Word is required"),
             category: z.string().min(1, "Category is required")
@@ -39,7 +39,6 @@ export const wordsCategoriesRouter = createTRPCRouter({
             if (error instanceof TRPCError) {
                 throw error;
             }
-
             throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "An unexpected error occurred",
@@ -52,7 +51,6 @@ export const wordsCategoriesRouter = createTRPCRouter({
    * @param seed The seed for today's puzzle. Assuming the seed is between 0 and 1
    * @throws {TRPCError} If something goes wrong
    */
-
     generateCategoriesList: publicProcedure.input(
         z.object({
             seed: z.number().gt(0).lt(1)
