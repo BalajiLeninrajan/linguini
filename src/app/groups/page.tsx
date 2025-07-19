@@ -6,6 +6,7 @@ import Header from "../_components/header";
 import { GroupName } from "~/components/ui/group-name";
 import { api } from "~/trpc/react";
 import Link from 'next/link';
+import { group } from "node:console";
 
 export default function GroupsPage() {
 
@@ -23,8 +24,22 @@ export default function GroupsPage() {
 
   const trpcContext = api.useUtils();
 
-  const { mutate: deleteGroupHook } = api.groups.delete.useMutation();
-  const { mutate: leaveGroupHook} = api.groups.leaveGroup.useMutation();
+  const { mutate: deleteGroupHook } = api.groups.delete.useMutation({
+    onSuccess: async () => {
+      await groupIDs.refetch();
+    },
+    onError: (error) => {
+      console.log(error);
+    }
+  });
+  const { mutate: leaveGroupHook} = api.groups.leaveGroup.useMutation({
+    onSuccess: async () => {
+      await groupIDs.refetch();
+    },
+    onError: (error) => {
+      console.log(error);
+    }
+  });
 
    useEffect(() => {
     const fetchGroupInfo = async () => {
@@ -35,6 +50,8 @@ export default function GroupsPage() {
           trpcContext.groups.getGroupFromId.fetch({ groupId: group.group_id })
         )
       );
+
+      console.log(results)
 
       const trimmedResults = results.map(group => ({
         id: group.id,
@@ -48,26 +65,25 @@ export default function GroupsPage() {
     };
 
     fetchGroupInfo();
-  }, [groupIDs]);
+  }, [groupIDs.data, userId]); 
 
-  const deleteGroup = async (groupId: number) => {
+  const deleteGroup = (groupId: number) => {
     try{
       deleteGroupHook({
         groupId: groupId,
       })
-      await groupIDs.refetch();
 
     }catch(error){
       console.log(error);
     }
   }
 
-  const leaveGroup = async (groupId: number) => {
+  const leaveGroup = (groupId: number) => {
     try{
+      console.log("here");
       leaveGroupHook({
         groupId: groupId,
       })
-      await groupIDs.refetch();
 
     }catch(error){
       console.log(error);
@@ -85,7 +101,11 @@ export default function GroupsPage() {
               <CardTitle className='text-yellow-600 text-5xl'>My Groups</CardTitle>
             </CardHeader>
 
-            {groups && groups.length > 0 ? (
+            {groupIDs.isLoading ? (
+              <CardContent>
+                <p>Loading...</p>
+              </CardContent>
+            ) : groups && groups.length > 0 ? (
               <CardContent>
                 <div className="flex flex-col gap-2 mb-6">
                   {groups.map((group, idx) => (
@@ -108,8 +128,12 @@ export default function GroupsPage() {
                 </div>
                 <Button variant="default" className="w-full text-base sm:text-lg font-bold h-16">Create Group</Button>
             </CardContent>
+            ) : groupIDs.data && groupIDs.data.length == 0 ?(
+              <CardContent>
+                <p>You are not a part of any groups :(</p>
+              </CardContent>
             ) : (
-              <p>Loading...</p>
+              <></>
             )}
 
           </Card>
@@ -118,5 +142,3 @@ export default function GroupsPage() {
     </>
   );
 }
-
-

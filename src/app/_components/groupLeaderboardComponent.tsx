@@ -24,11 +24,13 @@ export default function GroupLeaderboardComponent() {
     const currentUser = api.auth.currentUser.useQuery(undefined, {
         refetchOnWindowFocus: false,
     });
-    // const currUserId = currentUser?.id;
-    const currUserId = "1";
+    const currUserId = currentUser.data?.id ;
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
-        { userId: currUserId }
+        { userId: String(currUserId ?? "") },
+        {
+           enabled: !!currUserId,
+        }
     );
 
 
