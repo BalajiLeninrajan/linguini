@@ -8,6 +8,7 @@ import { useSearchParams , useRouter } from 'next/navigation';
 import { api } from "~/trpc/react";
 import { type User } from "~/types";
 import Link from 'next/link';
+import Image from "next/image";
 
 export default function GroupUpdateComponent() {
     const [newGroupName, setNewGroupName] = useState("");
@@ -131,7 +132,8 @@ export default function GroupUpdateComponent() {
                       {groupMembers.map((value, key) => (
                         <div key={key} className="bg-white p-2 px-4 rounded-full w-1/2 flex justify-between">
                           <h4>{value.username}</h4>
-                          <h4 className="cursor-pointer" onClick={() => removeMember(value.id)}>x</h4>
+                          <Image src='/close.svg' alt='close' width={15} height={15} className="cursor-pointer" onClick={() => removeMember(value.id)}/>
+                          {/* <h4 className="cursor-pointer" onClick={() => removeMember(value.id)}>x</h4> */}
                         </div>
                       ))}
                     </>
