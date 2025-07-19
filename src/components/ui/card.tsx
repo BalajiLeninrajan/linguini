@@ -15,7 +15,7 @@ function Card({ className, variant = "default", ...props }: CardProps) {
     <div
       data-slot="card"
       className={cn(
-        "text-card-foreground flex flex-col gap-3 sm:gap-4 md:gap-6 py-2 sm:py-4 md:py-6 px-2 sm:px-4 md:px-6",
+        "text-card-foreground flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-6 py-1 sm:py-2 md:py-4 lg:py-6 px-1 sm:px-2 md:px-4 lg:px-6",
         variantClass,
         className
       )}
@@ -29,7 +29,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-3 sm:px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6", // responsive horizontal padding
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1 sm:gap-1.5 px-2 sm:px-3 md:px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-3 sm:pb-4 md:pb-6", // responsive horizontal padding
         className
       )}
       {...props}
@@ -41,7 +41,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn("leading-none font-bold text-center text-2xl sm:text-4xl text-amber-900", className)} // responsive text size
+      className={cn("leading-none font-bold text-center text-lg sm:text-xl md:text-2xl lg:text-4xl text-amber-900", className)} // responsive text size
       {...props}
     />
   )
@@ -51,7 +51,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn("text-muted-foreground text-xs sm:text-sm", className)}
       {...props}
     />
   )
@@ -74,7 +74,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-3 sm:px-6 space-y-3 sm:space-y-4 md:space-y-6", className)}
+      className={cn("px-2 sm:px-3 md:px-6 space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-6", className)} // responsive horizontal padding and spacing
       {...props}
     />
   )
@@ -84,7 +84,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center px-3 sm:px-6 [.border-t]:pt-4 sm:pt-6", className)}
+      className={cn("flex items-center px-2 sm:px-3 md:px-6 [.border-t]:pt-2 sm:pt-3 md:pt-6", className)}
       {...props}
     />
   )
