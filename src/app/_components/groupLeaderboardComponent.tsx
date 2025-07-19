@@ -27,7 +27,7 @@ export default function GroupLeaderboardComponent() {
     const currUserId = currentUser.data?.id ;
 
     const { data: userGroups, isLoading: groupsLoading, error: queryError } = api.leaderboard.getUserGroups.useQuery(
-        { userId: String(currUserId ?? "") },
+        { userId: currUserId ?? -1 },
         {
            enabled: !!currUserId,
         }
