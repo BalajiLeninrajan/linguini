@@ -77,35 +77,14 @@ export default function GroupsPage() {
       setAlertContent(`You are about to delete your group ${groupName}`);
       setPendingAction({type: 'delete', groupId, groupName});
       setShowAlert(true);
-    // try{
-    //   setAlertContent(`You are about to delete your group ${groupName}`);
-    //   setShowAlert(true);
-    //   deleteGroupHook({
-    //     groupId: groupId,
-    //   })
-
-    // }catch(error){
-    //   console.log(error);
-    //   toast("Something went wrong, please try again.")
-    // }
   }
 
   const leaveGroup = (groupId: number, groupName: string) => {
     setAlertContent(`You are about to leave a group ${groupName}`);
     setPendingAction({type: 'leave', groupId, groupName});
     setShowAlert(true);
-    // try{
-    //   setAlertContent(`You are about to leave a group ${groupName}`);
-    //   setShowAlert(true);
-    //   leaveGroupHook({
-    //     groupId: groupId,
-    //   })
-
-    // }catch(error){
-    //   console.log(error);
-    //   toast("Something went wrong, please try again.")
-    // }
   }
+
 
 
   return (
