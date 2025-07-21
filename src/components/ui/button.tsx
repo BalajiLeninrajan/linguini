@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold hover:bg-amber-800 h-16 px-3 sm:px-6",
+          "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold hover:bg-amber-800 h-16 px-3 sm:px-6 rounded-full",
         leaderboard:
           "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-amber-800",
         edit: "bg-green-200 text-green-900 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-green-300",
