@@ -4,13 +4,15 @@ import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import Header from "./header";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { type User } from "~/types";
 import Link from "next/link";
 import { toast } from "sonner"
 import { type UserInvite } from "~/server/db";
 import Alert from "./alertComponent";
+import Image from "next/image";
+
 
 export default function GroupUpdateComponent() {
   const [newGroupName, setNewGroupName] = useState("");
@@ -207,12 +209,7 @@ export default function GroupUpdateComponent() {
                             >
                               Accepted
                           </Button>
-                          <h4
-                            className="cursor-pointer"
-                            onClick={() => removeMember(value.id, value.username)}
-                          >
-                            x
-                          </h4>
+                          <Image src="/close.svg" alt="Close" width={15} height={15} className="cursor-pointer" onClick={() => removeMember(value.id, value.username)}/>
                         </div>
                       ))}
                     </>
@@ -231,12 +228,7 @@ export default function GroupUpdateComponent() {
                             >
                               Pending
                           </Button>
-                          <h4
-                            className="cursor-pointer"
-                            onClick={() => withdrawInvite(value.recipient_id, value.username)}
-                          >
-                            x
-                          </h4>
+                          <Image src="/close.svg" alt="Close" width={15} height={15} className="cursor-pointer" onClick={() => withdrawInvite(value.recipient_id, value.username)}/>
                         </div>
                       ))}
                     </>
