@@ -18,7 +18,7 @@ export default function GamePage() {
   const [gameEnded, setGameEnded] = useState(false);
 
   //TO CHANGE: for testing only
-  const sampleUserId = 20;
+  const sampleUserId = 1;
   const gameId = 101;
 
 
@@ -49,7 +49,6 @@ export default function GamePage() {
 
   useEffect(() => {
     if (playExists.data !== undefined) {
-      console.log("Play exists:", playExists.data);
       if (playExists.data) {
         alert("You have already played this game!");
         setGameEnded(true); // Prevent playing
@@ -72,16 +71,7 @@ export default function GamePage() {
   }, [gameStarted, gameEnded, characterCount]);
 
   useEffect(() => {
-    console.log(
-      "Character count changed:",
-      characterCount,
-      "gameStarted:",
-      gameStarted,
-      "gameEnded:",
-      gameEnded,
-    );
     if (characterCount === 100 && gameStarted && !gameEnded) {
-      console.log("Character limit reached! Ending play...");
       endPlay({
         gameId: gameId,
         userId: sampleUserId,
@@ -101,7 +91,6 @@ export default function GamePage() {
 
   useEffect(() => {
     if (playExists.data === false) {
-      console.log("Starting play...");
       addPlay({
         gameId: gameId,
         userId: sampleUserId,

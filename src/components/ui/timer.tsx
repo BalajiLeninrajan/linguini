@@ -2,19 +2,26 @@ import * as React from "react";
 import { cn } from "~/lib/utils";
 
 interface TimerProps {
-  time: string;
+  seconds: number;
   className?: string;
 }
 
-export function Timer({ time, className }: TimerProps) {
+// Helper function to format timer display
+const formatTime = (totalSeconds: number): string => {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+
+export function Timer({ seconds, className }: TimerProps) {
   return (
     <div className={cn("text-center", className)}>
-      <div 
-        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
-        style={{ color: '#CD853F' }}
+      <div
+        className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl"
+        style={{ color: "#CD853F" }}
       >
-        {time}
+        {formatTime(seconds)}
       </div>
     </div>
   );
-} 
+}
