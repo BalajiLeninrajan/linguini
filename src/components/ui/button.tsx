@@ -10,12 +10,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold hover:bg-amber-800 h-16 px-3 sm:px-6 rounded-full",
+          "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold hover:bg-amber-800 h-16 px-3 sm:px-6 rounded-full cursor-pointer",
         leaderboard:
-          "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-amber-800",
-        edit: "bg-green-200 text-green-900 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-green-300",
+          "bg-amber-900 text-yellow-400 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-amber-800 cursor-pointer",
+        edit: "bg-green-200 text-green-900 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-green-300 cursor-pointer",
         danger:
-          "bg-red-200 text-red-900 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-red-300",
+          "bg-red-200 text-red-900 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-red-300 cursor-pointer",
         placeholder: "h-8 sm:h-10 px-3 sm:px-6 rounded-full invisible",
         nav: "bg-[#FFF1D4] text-amber-900 hover:bg-amber-200 rounded-full p-2 [&_svg]:size-16",
       },
