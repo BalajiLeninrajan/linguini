@@ -124,7 +124,7 @@ export interface LeaderboardUser {
 }
 
 //delete after rebase with main
-export interface userGroup{
+export interface userGroup {
   id: string;
   name: string;
 }

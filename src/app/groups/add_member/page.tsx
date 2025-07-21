@@ -11,18 +11,24 @@ export default function AddGroupMemberPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-[#FFF1D4] relative px-4">
-        <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl mx-auto">
-          <Card variant="yellow" className="w-full p-2 sm:p-4 md:p-8 min-h-[200px] sm:min-h-[300px] md:min-h-[400px] relative">
+      <div className="relative flex min-h-screen items-center justify-center bg-[#FFF1D4] px-4">
+        <div className="mx-auto w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl">
+          <Card
+            variant="yellow"
+            className="relative min-h-[200px] w-full p-2 sm:min-h-[300px] sm:p-4 md:min-h-[400px] md:p-8"
+          >
             <CardHeader className="text-center">
-              <CardTitle className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-900">
+              <CardTitle className="text-xl font-bold text-amber-900 sm:text-2xl md:text-3xl">
                 Patricks Group: <span className="font-extrabold">SE2028</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6 flex flex-col flex-1 pb-12 sm:pb-16">
-              <form onSubmit={(e) => {
-                e.preventDefault();
-              }} className="space-y-4 sm:space-y-6">
+            <CardContent className="flex flex-1 flex-col space-y-4 pb-12 sm:space-y-6 sm:pb-16">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+                className="space-y-4 sm:space-y-6"
+              >
                 <div className="space-y-2">
                   <Input
                     placeholder="New member email..."
@@ -36,12 +42,13 @@ export default function AddGroupMemberPage() {
                 </Button>
               </form>
             </CardContent>
-            <div className="absolute bottom-0 left-0 w-full text-center text-sm sm:text-base md:text-lg pb-4 sm:pb-6 text-amber-900">
-              <span className="font-bold">Note:</span> All members must have Linguini accounts
+            <div className="absolute bottom-0 left-0 w-full pb-4 text-center text-sm text-amber-900 sm:pb-6 sm:text-base md:text-lg">
+              <span className="font-bold">Note:</span> All members must have
+              Linguini accounts
             </div>
           </Card>
         </div>
       </div>
     </>
   );
-} 
+}
