@@ -6,7 +6,6 @@ import { Geist } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Toaster } from "sonner";
 
-
 export const metadata: Metadata = {
   title: "Linguini",
   description: "CS 348 | Group 26",
