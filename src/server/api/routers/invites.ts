@@ -39,6 +39,7 @@ export const invitesRouter = createTRPCRouter({
    * Send an invite to another person
    * @param groupId The id of the group
    * @param recipientId The id of the recipient (user). The user must NOT already be in the group
+   * @throws {TRPCError} If the sender is not the group owner or the user is already in the group
    */
   send: protectedProcedure
     .input(
@@ -114,6 +115,7 @@ export const invitesRouter = createTRPCRouter({
    * Accept an invite from someone else
    * @param groupId The id of the group
    * @param senderId The sender of the invite
+   * @throws {TRPCError} If this invite does not exist
    */
   accept: protectedProcedure
     .input(
@@ -174,6 +176,7 @@ export const invitesRouter = createTRPCRouter({
    * Withdraw an invite that you sent to another person
    * @param groupId The id of the group
    * @param recipientId The id of the recipient (user). The user must NOT already be in the group
+   * @throws {TRPCError} If this invite doesn't exist
    */
   withdraw: protectedProcedure
     .input(
@@ -220,6 +223,7 @@ export const invitesRouter = createTRPCRouter({
    * Decline an invite someone sent you
    * @param groupId The id of the group
    * @param senderId The sender of the invite
+   * @throws {TRPCError} If this invite doesn't exist
    */
   decline: protectedProcedure
     .input(
