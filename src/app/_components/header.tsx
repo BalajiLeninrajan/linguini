@@ -4,8 +4,10 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Users, Home, BarChart3, Heart, LogOut } from "lucide-react";
 import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const router = useRouter();
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
@@ -13,6 +15,7 @@ export default function Header() {
   const handleLogout = async () => {
     localStorage.removeItem("token");
     await currentUser.refetch();
+    router.push("/login");
   };
 
   return (
