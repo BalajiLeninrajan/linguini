@@ -19,7 +19,8 @@ export default function GamePage() {
 
   //TO CHANGE: for testing only
   const sampleUserId = 20;
-  const gameId = 798890;
+  const gameId = 101;
+
 
   const { mutate: addPlay } = api.play.addPlay.useMutation({
     onSuccess: () => {
@@ -28,7 +29,7 @@ export default function GamePage() {
     },
     onError: (error) => {
       console.error("Failed to create play:", error);
-    }
+    },
   });
 
   const { mutate: endPlay } = api.play.endPlay.useMutation({
@@ -38,12 +39,12 @@ export default function GamePage() {
     },
     onError: (error) => {
       console.error("Failed to end play:", error);
-    }
+    },
   });
 
   const playExists = api.play.playExists.useQuery({
     gameId: gameId,
-    userId: sampleUserId
+    userId: sampleUserId,
   });
 
   useEffect(() => {
@@ -62,43 +63,59 @@ export default function GamePage() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (gameStarted && !gameEnded) {
+    if (gameStarted && !gameEnded && characterCount < 100) {
       interval = setInterval(() => {
-        setSeconds(prev => prev + 1);
+        setSeconds((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [gameStarted, gameEnded]);
+  }, [gameStarted, gameEnded, characterCount]);
 
   useEffect(() => {
-    console.log("Character count changed:", characterCount, "gameStarted:", gameStarted, "gameEnded:", gameEnded);
+    console.log(
+      "Character count changed:",
+      characterCount,
+      "gameStarted:",
+      gameStarted,
+      "gameEnded:",
+      gameEnded,
+    );
     if (characterCount === 100 && gameStarted && !gameEnded) {
       console.log("Character limit reached! Ending play...");
-              endPlay({
-          gameId: gameId,
-          userId: sampleUserId,
-          categoryCount: categoryCount,
-          endTime: new Date()
-        });
+      endPlay({
+        gameId: gameId,
+        userId: sampleUserId,
+        categoryCount: categoryCount,
+        endTime: new Date(),
+      });
     }
-  }, [characterCount, gameStarted, gameEnded, addPlay, endPlay, gameId, sampleUserId]);
+  }, [
+    characterCount,
+    gameStarted,
+    gameEnded,
+    addPlay,
+    endPlay,
+    gameId,
+    sampleUserId,
+  ]);
 
   useEffect(() => {
     if (playExists.data === false) {
       console.log("Starting play...");
       addPlay({
         gameId: gameId,
-        userId: sampleUserId
+        userId: sampleUserId,
+        startTime: new Date(),
       });
     }
-  }, [playExists.data]); 
+  }, [playExists.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (word.trim() && !gameEnded && characterCount < 100) {
       const newCharacterCount = Math.min(characterCount + word.length, 100);
       setCharacterCount(newCharacterCount);
-      setCategoryCount(prev => prev + 1);
+      setCategoryCount((prev) => prev + 1);
       setWord("");
       console.log("Word submitted, character count:", newCharacterCount);
     }
@@ -108,15 +125,15 @@ export default function GamePage() {
     <>
       <Header />
       <div className="min-h-screen bg-[#FFF1D4]">
-        <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-3 sm:px-4">
-          <div className="w-full max-w-xs sm:max-w-sm md:max-w-md space-y-12 sm:space-y-16">
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-3 sm:px-4">
+          <div className="w-full max-w-xs space-y-12 sm:max-w-sm sm:space-y-16 md:max-w-md">
             <div className="-mt-12 sm:-mt-20">
-              <Timer time={`${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`} />
+              <Timer seconds={seconds} />
             </div>
 
-            <GameStats 
-              characterCount={characterCount} 
-              categoryCount={categoryCount} 
+            <GameStats
+              characterCount={characterCount}
+              categoryCount={categoryCount}
             />
 
             <div className="space-y-3 sm:space-y-4">
@@ -124,15 +141,19 @@ export default function GamePage() {
 
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <Input
-                  placeholder={gameEnded || characterCount >= 100 ? "Game finished!" : "Enter your word here..."}
+                  placeholder={
+                    gameEnded || characterCount >= 100
+                      ? "Game finished!"
+                      : "Enter your word here..."
+                  }
                   value={word}
                   onChange={handleWordChange}
                   className="w-full"
                   disabled={gameEnded || characterCount >= 100}
                 />
-                <Button 
-                  variant="default" 
-                  className="w-full" 
+                <Button
+                  variant="default"
+                  className="w-full"
                   onClick={() => console.log("skip category clicked")}
                   disabled={gameEnded || characterCount >= 100}
                 >
@@ -145,4 +166,4 @@ export default function GamePage() {
       </div>
     </>
   );
-} 
+}
