@@ -6,11 +6,20 @@ import Header from "../_components/header";
 import { GroupName } from "~/components/ui/group-name";
 import { api } from "~/trpc/react";
 import Link from "next/link";
+import Alert from "../_components/alertComponent";
+import { toast } from "sonner"
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState<
     { id: number; name: string; canEdit: boolean }[]
   >();
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertContent, setAlertContent] = useState("");
+  const [pendingAction, setPendingAction] = useState<null | {
+    type: 'delete' | 'leave',
+    groupId: number,
+    groupName: string
+  }>(null);
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -67,26 +76,18 @@ export default function GroupsPage() {
     void fetchGroupInfo();
   }, [groupIDs.data, userId]);
 
-  const deleteGroup = (groupId: number) => {
-    try {
-      deleteGroupHook({
-        groupId: groupId,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const deleteGroup = (groupId: number, groupName: string) => {
+      setAlertContent(`You are about to delete your group ${groupName}`);
+      setPendingAction({type: 'delete', groupId, groupName});
+      setShowAlert(true);
+  }
 
-  const leaveGroup = (groupId: number) => {
-    try {
-      console.log("here");
-      leaveGroupHook({
-        groupId: groupId,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const leaveGroup = (groupId: number, groupName: string) => {
+    setAlertContent(`You are about to leave a group ${groupName}`);
+    setPendingAction({type: 'leave', groupId, groupName});
+    setShowAlert(true);
+  }
+
 
   return (
     <>
@@ -142,10 +143,10 @@ export default function GroupsPage() {
                           onClick={
                             group.canEdit
                               ? () => {
-                                  deleteGroup(group.id);
+                                  deleteGroup(group.id, group.name);
                                 }
                               : () => {
-                                  leaveGroup(group.id);
+                                  leaveGroup(group.id, group.name);
                                 }
                           }
                         >
@@ -182,6 +183,45 @@ export default function GroupsPage() {
           </Card>
         </div>
       </div>
+
+      <Alert
+        open={showAlert}
+        onOpenChange={setShowAlert}
+        body={alertContent}
+        onConfirm={() => {
+          if(!pendingAction){
+            return;
+          }
+
+          if(pendingAction.type == 'delete'){
+            try{
+                deleteGroupHook({
+                  groupId: pendingAction.groupId,
+                })
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+
+          if(pendingAction.type == 'leave'){
+            try{
+              leaveGroupHook({
+                groupId: pendingAction.groupId,
+              })
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+          
+          setShowAlert(false);
+        }}
+      />
     </>
   );
 }
+
+

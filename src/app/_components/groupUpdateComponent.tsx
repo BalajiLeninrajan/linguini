@@ -10,6 +10,7 @@ import { type User } from "~/types";
 import Link from "next/link";
 import { toast } from "sonner"
 import { type UserInvite } from "~/server/db";
+import Alert from "./alertComponent";
 
 export default function GroupUpdateComponent() {
   const [newGroupName, setNewGroupName] = useState("");
@@ -20,6 +21,13 @@ export default function GroupUpdateComponent() {
   const [sentInvitations, setSentInvitations] = useState<Pick<UserInvite, "recipient_id" | "username">[]>();
   const searchParams = useSearchParams();
   const groupId = searchParams.get("groupId");
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertContent, setAlertContent] = useState("");
+  const [pendingAction, setPendingAction] = useState<null | {
+    type: 'remove' | 'withdraw',
+    memberId: number,
+    memberName: string
+  }>(null);
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -117,15 +125,10 @@ export default function GroupUpdateComponent() {
     }
   };
 
-  const removeMember = (memberId: number) => {
-    try {
-      removeMemberHook({
-        groupId: Number(groupId),
-        userId: memberId,
-      });
-    } catch (error) {
-      console.log(error);
-    }
+  const removeMember = (memberId: number, memberName: string) => {
+    setAlertContent(`You are about to remove a member ${memberName}`);
+    setPendingAction({type: 'remove', memberName, memberId});
+    setShowAlert(true);
   };
 
   const inviteMember = (username: string) => {
@@ -143,16 +146,11 @@ export default function GroupUpdateComponent() {
     }
   };
 
+
   const withdrawInvite = (recipientId: number, recipientName: string) => {
-    try{
-      withdrawHook({
-        groupId: Number(groupId),
-        recipientId: recipientId,
-      })
-    }catch(error){
-      console.log(error);
-      toast("Something went wrong, please try again")
-    }
+    setAlertContent(`You are about to uninvite a member ${recipientName}`);
+    setPendingAction({type: 'withdraw', memberName: recipientName, memberId: recipientId});
+    setShowAlert(true);
   }
 
   return (
@@ -211,7 +209,7 @@ export default function GroupUpdateComponent() {
                           </Button>
                           <h4
                             className="cursor-pointer"
-                            onClick={() => removeMember(value.id)}
+                            onClick={() => removeMember(value.id, value.username)}
                           >
                             x
                           </h4>
@@ -271,6 +269,44 @@ export default function GroupUpdateComponent() {
           <p>Loading...</p>
         )}
       </div>
+
+      <Alert
+        open={showAlert}
+        onOpenChange={setShowAlert}
+        body={alertContent}
+        onConfirm={() => {
+          if(!pendingAction){
+            return;
+          }
+
+          if(pendingAction.type == 'withdraw'){
+            try{
+                withdrawHook({
+                  groupId: Number(groupId),
+                  recipientId: pendingAction.memberId,
+                })
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+
+          if(pendingAction.type == 'remove'){
+            try{
+              removeMemberHook({
+                groupId: Number(groupId),
+                userId: pendingAction.memberId,
+              });
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+          
+          setShowAlert(false);
+        }}
+      />
     </>
   );
 }
