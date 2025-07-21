@@ -1,4 +1,5 @@
 import type { DBUser, DBGroup } from "~/server/db";
+import type { GameModeType } from "~/server/db";
 
 export type User = Omit<DBUser, "password" | "created_at">;
 
@@ -18,4 +19,10 @@ export type TimeValue = number | { minutes: number } | null | undefined;
 export type userGroup = {
   id: string;
   name: string;
+};
+
+export type Game = {
+  gameMode: GameModeType;
+  seed: number;
+  createdAt: Date;
 };
