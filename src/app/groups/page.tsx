@@ -14,6 +14,11 @@ export default function GroupsPage() {
   const [groups, setGroups] = useState<{ id: number, name: string; canEdit: boolean }[]>([]);
   const [showAlert, setShowAlert] = useState(false);
   const [alertContent, setAlertContent] = useState("");
+  const [pendingAction, setPendingAction] = useState<null | {
+    type: 'delete' | 'leave',
+    groupId: number,
+    groupName: string
+  }>(null);
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
       refetchOnWindowFocus: false,
@@ -69,31 +74,37 @@ export default function GroupsPage() {
   }, [groupIDs.data, userId]); 
 
   const deleteGroup = (groupId: number, groupName: string) => {
-    try{
       setAlertContent(`You are about to delete your group ${groupName}`);
+      setPendingAction({type: 'delete', groupId, groupName});
       setShowAlert(true);
-      deleteGroupHook({
-        groupId: groupId,
-      })
+    // try{
+    //   setAlertContent(`You are about to delete your group ${groupName}`);
+    //   setShowAlert(true);
+    //   deleteGroupHook({
+    //     groupId: groupId,
+    //   })
 
-    }catch(error){
-      console.log(error);
-      toast("Something went wrong, please try again.")
-    }
+    // }catch(error){
+    //   console.log(error);
+    //   toast("Something went wrong, please try again.")
+    // }
   }
 
   const leaveGroup = (groupId: number, groupName: string) => {
-    try{
-      setAlertContent(`You are about to leave a group ${groupName}`);
-      setShowAlert(true);
-      leaveGroupHook({
-        groupId: groupId,
-      })
+    setAlertContent(`You are about to leave a group ${groupName}`);
+    setPendingAction({type: 'leave', groupId, groupName});
+    setShowAlert(true);
+    // try{
+    //   setAlertContent(`You are about to leave a group ${groupName}`);
+    //   setShowAlert(true);
+    //   leaveGroupHook({
+    //     groupId: groupId,
+    //   })
 
-    }catch(error){
-      console.log(error);
-      toast("Something went wrong, please try again.")
-    }
+    // }catch(error){
+    //   console.log(error);
+    //   toast("Something went wrong, please try again.")
+    // }
   }
 
 
@@ -153,6 +164,34 @@ export default function GroupsPage() {
         onOpenChange={setShowAlert}
         body={alertContent}
         onConfirm={() => {
+          if(!pendingAction){
+            return;
+          }
+
+          if(pendingAction.type == 'delete'){
+            try{
+                deleteGroupHook({
+                  groupId: pendingAction.groupId,
+                })
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+
+          if(pendingAction.type == 'leave'){
+            try{
+              leaveGroupHook({
+                groupId: pendingAction.groupId,
+              })
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+          
           setShowAlert(false);
         }}
       />
