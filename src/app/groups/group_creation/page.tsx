@@ -6,6 +6,7 @@ import { Button } from "~/components/ui/button";
 import Header from "../../_components/header";
 import { api } from "~/trpc/react";
 import { useRouter } from 'next/navigation';
+import { toast } from "sonner";
 
 export default function GroupCreationPage() {
   const [groupName, setGroupName] = useState("");
@@ -43,6 +44,7 @@ export default function GroupCreationPage() {
       })
     }catch(error){
       console.log(error);
+      toast("Something went wrong, please try again.")
     }
   }
 

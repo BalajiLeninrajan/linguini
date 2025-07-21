@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Header from '../_components/header';
 import LeaderboardContainer from '../_components/leaderboardContainer';
 import { api } from '~/trpc/react';
+import { toast } from "sonner";
 import type { LeaderboardUser } from '~/server/db';
 
 export default function Leaderboard() {
@@ -25,6 +26,7 @@ export default function Leaderboard() {
         }
         if (queryError) {
             setError(queryError.message);
+            toast("Something went wrong, please try again.");
         }
     }, [data, queryError]);
 

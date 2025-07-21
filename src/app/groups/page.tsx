@@ -6,10 +6,19 @@ import Header from "../_components/header";
 import { GroupName } from "~/components/ui/group-name";
 import { api } from "~/trpc/react";
 import Link from 'next/link';
+import { toast } from "sonner";
+import Alert from "../_components/alertComponent";
 
 export default function GroupsPage() {
 
   const [groups, setGroups] = useState<{ id: number, name: string; canEdit: boolean }[]>([]);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertContent, setAlertContent] = useState("");
+  const [pendingAction, setPendingAction] = useState<null | {
+    type: 'delete' | 'leave',
+    groupId: number,
+    groupName: string
+  }>(null);
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
       refetchOnWindowFocus: false,
@@ -59,34 +68,43 @@ export default function GroupsPage() {
       }))
 
       setGroups(trimmedResults);
-
-      console.log(trimmedResults);
     };
 
     void fetchGroupInfo();
   }, [groupIDs.data, userId]); 
 
-  const deleteGroup = (groupId: number) => {
-    try{
-      deleteGroupHook({
-        groupId: groupId,
-      })
+  const deleteGroup = (groupId: number, groupName: string) => {
+      setAlertContent(`You are about to delete your group ${groupName}`);
+      setPendingAction({type: 'delete', groupId, groupName});
+      setShowAlert(true);
+    // try{
+    //   setAlertContent(`You are about to delete your group ${groupName}`);
+    //   setShowAlert(true);
+    //   deleteGroupHook({
+    //     groupId: groupId,
+    //   })
 
-    }catch(error){
-      console.log(error);
-    }
+    // }catch(error){
+    //   console.log(error);
+    //   toast("Something went wrong, please try again.")
+    // }
   }
 
-  const leaveGroup = (groupId: number) => {
-    try{
-      console.log("here");
-      leaveGroupHook({
-        groupId: groupId,
-      })
+  const leaveGroup = (groupId: number, groupName: string) => {
+    setAlertContent(`You are about to leave a group ${groupName}`);
+    setPendingAction({type: 'leave', groupId, groupName});
+    setShowAlert(true);
+    // try{
+    //   setAlertContent(`You are about to leave a group ${groupName}`);
+    //   setShowAlert(true);
+    //   leaveGroupHook({
+    //     groupId: groupId,
+    //   })
 
-    }catch(error){
-      console.log(error);
-    }
+    // }catch(error){
+    //   console.log(error);
+    //   toast("Something went wrong, please try again.")
+    // }
   }
 
 
@@ -119,7 +137,7 @@ export default function GroupsPage() {
                         <Link href={`/leaderboard/group?groupId=${group.id}&groupName=${group.name}`} >
                           <Button variant="leaderboard" className="h-10 px-6 rounded-full">Leaderboard</Button>
                         </Link>
-                        <Button variant="danger" className="h-10 px-6 rounded-full" onClick={group.canEdit ? () => {deleteGroup(group.id)} : () => {leaveGroup(group.id)}}>
+                        <Button variant="danger" className="h-10 px-6 rounded-full" onClick={group.canEdit ? () => {deleteGroup(group.id, group.name)} : () => {leaveGroup(group.id, group.name)}}>
                           {group.canEdit ? "Delete" : "Leave"}</Button>
                       </div>
                     </div>
@@ -140,6 +158,43 @@ export default function GroupsPage() {
           </Card>
         </div>
       </div>
+
+      <Alert
+        open={showAlert}
+        onOpenChange={setShowAlert}
+        body={alertContent}
+        onConfirm={() => {
+          if(!pendingAction){
+            return;
+          }
+
+          if(pendingAction.type == 'delete'){
+            try{
+                deleteGroupHook({
+                  groupId: pendingAction.groupId,
+                })
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+
+          if(pendingAction.type == 'leave'){
+            try{
+              leaveGroupHook({
+                groupId: pendingAction.groupId,
+              })
+
+            }catch(error){
+              console.log(error);
+              toast("Something went wrong, please try again.")
+            }
+          }
+          
+          setShowAlert(false);
+        }}
+      />
     </>
   );
 }

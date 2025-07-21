@@ -8,6 +8,7 @@ import { api } from '~/trpc/react';
 import type { userGroup } from '~/server/db';
 import type { LeaderboardUser } from '~/types';
 import { useSearchParams } from 'next/navigation';
+import { toast } from "sonner";
 
 export default function GroupLeaderboardComponent() {
 
@@ -56,6 +57,7 @@ export default function GroupLeaderboardComponent() {
         }
         if (queryError) {
             setError(queryError.message);
+            toast("Something went wrong, please try again.");
         }
     }, [userGroups, queryError, currentGroup]);
 
@@ -65,6 +67,7 @@ export default function GroupLeaderboardComponent() {
         }
         if (leaderboardError) {
             setError(leaderboardError.message);
+            toast("Something went wrong, please try again.");
         }
     }, [localLeaderboard, leaderboardError]);
     
