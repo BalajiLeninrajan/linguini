@@ -7,6 +7,7 @@ import {
   type DBGroup,
   type DBGroupUser,
   type DBUser,
+  type UserInvite
 } from "~/server/db";
 
 // Helper function to add a member
@@ -310,11 +311,12 @@ export const invitesRouter = createTRPCRouter({
    * Get all the invites where the current user is the recipient
    */
   getInboundInvites: protectedProcedure.query(
-    async ({ ctx }): Promise<DBInvite[]> => {
+    async ({ ctx }): Promise<UserInvite[]> => {
       try {
-        const inboundInvites: DBInvite[] = await sql`
-                SELECT *
-                FROM invites
+        const inboundInvites: UserInvite[] = await sql`
+                SELECT sender_id, recipient_id, group_id, users.username, groups.name
+                FROM invites JOIN users on users.id = invites.sender_id
+                JOIN groups on groups.id = invites.group_id
                 WHERE recipient_id = ${ctx.user.id}
             `;
         return inboundInvites;

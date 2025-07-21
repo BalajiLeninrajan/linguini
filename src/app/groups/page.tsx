@@ -167,6 +167,14 @@ export default function GroupsPage() {
             ) : groupIDs.data && groupIDs.data.length == 0 ? (
               <CardContent>
                 <p>You are not a part of any groups :(</p>
+                <Link href="/groups/group_creation">
+                  <Button
+                    variant="default"
+                    className="h-16 w-full text-base font-bold sm:text-lg"
+                  >
+                    Create Group
+                  </Button>
+                </Link>
               </CardContent>
             ) : (
               <></>

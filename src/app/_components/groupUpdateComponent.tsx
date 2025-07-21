@@ -8,6 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import { type User } from "~/types";
 import Link from "next/link";
+import { toast } from "sonner"
 
 export default function GroupUpdateComponent() {
   const [newGroupName, setNewGroupName] = useState("");
@@ -39,6 +40,7 @@ export default function GroupUpdateComponent() {
     },
     onError: (error) => {
       console.log(error);
+      toast("Something went wrong, please try again!")
     },
   });
 
@@ -50,6 +52,16 @@ export default function GroupUpdateComponent() {
       console.log(error);
     },
   });
+
+  const { mutate: inviteHook } = api.invites.send.useMutation({
+    onSuccess: async() => {
+      toast("You just invited someone to join your group !")
+    },
+    onError: (error) => {
+      console.log(error)
+      toast("Something went wrong, please try again!")
+    }
+  })
 
   useEffect(() => {
     if (userInfo.data) {
@@ -95,7 +107,15 @@ export default function GroupUpdateComponent() {
   const inviteMember = (username: string) => {
     //checking if the new member is not already a member of the group
     if (!groupMembers.some((user) => user.username == username)) {
-      //Jane's api goes here
+      try{
+        inviteHook({
+          groupId: Number(groupId),
+          identifier: newMember,
+        })
+      }catch(error){
+        console.log(error);
+        toast("Something went wrong, please try again!");
+      }
     }
   };
 
@@ -155,7 +175,7 @@ export default function GroupUpdateComponent() {
                 </div>
                 <div className="flex justify-between space-y-2">
                   <Input
-                    placeholder={"New member username"}
+                    placeholder={"New member username or email"}
                     value={newMember}
                     onChange={(e) => setNewMember(e.target.value)}
                     className="w-5/7"
