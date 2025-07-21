@@ -21,7 +21,6 @@ export default function GamePage() {
   const sampleUserId = 1;
   const gameId = 101;
 
-
   const { mutate: addPlay } = api.play.addPlay.useMutation({
     onSuccess: () => {
       console.log("Play created successfully");
@@ -87,6 +86,7 @@ export default function GamePage() {
     endPlay,
     gameId,
     sampleUserId,
+    categoryCount,
   ]);
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function GamePage() {
         startTime: new Date(),
       });
     }
-  }, [playExists.data]);
+  }, [addPlay, playExists.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

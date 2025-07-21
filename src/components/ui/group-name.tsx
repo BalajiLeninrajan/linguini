@@ -6,6 +6,8 @@ interface GroupNameProps {
 
 export function GroupName({ name }: GroupNameProps) {
   return (
-    <span className="text-left text-base sm:text-lg md:text-xl text-gray-600 flex-grow pr-2 md:truncate md:overflow-hidden">{name}</span>
+    <span className="flex-grow pr-2 text-left text-base text-gray-600 sm:text-lg md:truncate md:overflow-hidden md:text-xl">
+      {name}
+    </span>
   );
-} 
+}

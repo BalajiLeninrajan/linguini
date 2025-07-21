@@ -18,4 +18,4 @@ export type TimeValue = number | { minutes: number } | null | undefined;
 export type userGroup = {
   id: string;
   name: string;
-}
+};
