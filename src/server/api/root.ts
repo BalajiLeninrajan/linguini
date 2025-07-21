@@ -4,9 +4,10 @@ import { groupsRouter } from "~/server/api/routers/groups";
 import { usersRouter } from "~/server/api/routers/users";
 import { wordsCategoriesRouter } from "~/server/api/routers/words-categories";
 import { invitesRouter } from "./routers/invites";
+import { leaderboardRouter } from "~/server/api/routers/leaderboard";
+import { playRouter } from "~/server/api/routers/plays";
 
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-import { leaderboardRouter } from "./routers/leaderboard";
 
 /**
  * This is the primary router for your server.
@@ -21,6 +22,7 @@ export const appRouter = createTRPCRouter({
   leaderboard: leaderboardRouter,
   wordCategories: wordsCategoriesRouter,
   invites: invitesRouter,
+  play: playRouter,
 });
 
 // export type definition of API
