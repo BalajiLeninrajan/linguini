@@ -159,9 +159,17 @@ export default function GroupsPage() {
                 <Link href="/groups/group_creation">
                   <Button
                     variant="default"
-                    className="h-16 w-full text-base font-bold sm:text-lg"
+                    className="h-16 w-full text-base font-bold sm:text-lg mb-2"
                   >
                     Create Group
+                  </Button>
+                </Link>
+                <Link href="/invitations">
+                  <Button
+                    variant="default"
+                    className="h-16 w-full text-base font-bold sm:text-lg"
+                  >
+                    View My Invitations
                   </Button>
                 </Link>
               </CardContent>
@@ -171,9 +179,17 @@ export default function GroupsPage() {
                 <Link href="/groups/group_creation">
                   <Button
                     variant="default"
-                    className="h-16 w-full text-base font-bold sm:text-lg"
+                    className="h-16 w-full text-base font-bold sm:text-lg mb-2"
                   >
                     Create Group
+                  </Button>
+                </Link>
+                <Link href="/invitations">
+                  <Button
+                    variant="default"
+                    className="h-16 w-full text-base font-bold sm:text-lg"
+                  >
+                    View My Invitations
                   </Button>
                 </Link>
               </CardContent>
