@@ -17,11 +17,13 @@ const buttonVariants = cva(
         danger:
           "bg-red-200 text-red-900 text-xs sm:text-lg font-bold rounded-full px-3 sm:px-6 py-2 sm:py-3 hover:bg-red-300",
         placeholder: "h-8 sm:h-10 px-3 sm:px-6 rounded-full invisible",
+        nav: "bg-[#FFF1D4] text-amber-900 hover:bg-amber-200 rounded-full p-2 [&_svg]:size-16",
       },
       size: {
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",
+        nav: "size-16",
         default: "h-13",
       },
     },

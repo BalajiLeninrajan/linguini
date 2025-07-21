@@ -1,90 +1,155 @@
 "use client";
-import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "~/components/ui/card";
+import { useState, useEffect } from "react";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { Timer } from "~/components/ui/timer";
+import { GameStats } from "~/components/ui/game-stats";
+import { CategoryDisplay } from "~/components/ui/category-display";
 import Header from "../_components/header";
+import { api } from "~/trpc/react";
 
 export default function GamePage() {
   const [word, setWord] = useState("");
-  const [timer, setTimer] = useState("2 min 34 s");
-  const [characterCount, setCharacterCount] = useState(13);
-  const [categoryCount, setCategoryCount] = useState(2);
+  const [seconds, setSeconds] = useState(0);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [categoryCount, setCategoryCount] = useState(0);
   const [currentCategory, setCurrentCategory] = useState("Actor");
+  const [gameStarted, setGameStarted] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
+
+  //TO CHANGE: for testing only
+  const sampleUserId = 1;
+  const gameId = 101;
+
+  const { mutate: addPlay } = api.play.addPlay.useMutation({
+    onSuccess: () => {
+      console.log("Play created successfully");
+      setGameStarted(true);
+    },
+    onError: (error) => {
+      console.error("Failed to create play:", error);
+    },
+  });
+
+  const { mutate: endPlay } = api.play.endPlay.useMutation({
+    onSuccess: () => {
+      console.log("Play ended successfully!");
+      setGameEnded(true);
+    },
+    onError: (error) => {
+      console.error("Failed to end play:", error);
+    },
+  });
+
+  const playExists = api.play.playExists.useQuery({
+    gameId: gameId,
+    userId: sampleUserId,
+  });
+
+  useEffect(() => {
+    if (playExists.data !== undefined) {
+      if (playExists.data) {
+        alert("You have already played this game!");
+        setGameEnded(true); // Prevent playing
+      }
+    }
+  }, [playExists.data]);
+
+  const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWord(e.target.value);
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (gameStarted && !gameEnded && characterCount < 100) {
+      interval = setInterval(() => {
+        setSeconds((prev) => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [gameStarted, gameEnded, characterCount]);
+
+  useEffect(() => {
+    if (characterCount === 100 && gameStarted && !gameEnded) {
+      endPlay({
+        gameId: gameId,
+        userId: sampleUserId,
+        categoryCount: categoryCount,
+        endTime: new Date(),
+      });
+    }
+  }, [
+    characterCount,
+    gameStarted,
+    gameEnded,
+    addPlay,
+    endPlay,
+    gameId,
+    sampleUserId,
+  ]);
+
+  useEffect(() => {
+    if (playExists.data === false) {
+      addPlay({
+        gameId: gameId,
+        userId: sampleUserId,
+        startTime: new Date(),
+      });
+    }
+  }, [playExists.data]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (word.trim() && !gameEnded && characterCount < 100) {
+      const newCharacterCount = Math.min(characterCount + word.length, 100);
+      setCharacterCount(newCharacterCount);
+      setCategoryCount((prev) => prev + 1);
+      setWord("");
+      console.log("Word submitted, character count:", newCharacterCount);
+    }
+  };
 
   return (
     <>
       <Header />
-      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-        <div className="mx-auto w-full max-w-md sm:max-w-lg md:max-w-xl">
-          <Card variant="yellow" className="relative w-full">
-            {/* Header Bar */}
-            <div className="flex items-center justify-between rounded-t-xl bg-amber-800 px-4 py-3">
-              <div className="text-2xl font-bold text-amber-100 italic">
-                linguini
-              </div>
-              <div className="flex gap-2">
-                {/* Placeholder for icons - not adding actual icons as requested */}
-                <div className="h-6 w-6 rounded bg-amber-700"></div>
-                <div className="h-6 w-6 rounded bg-amber-700"></div>
-                <div className="h-6 w-6 rounded bg-amber-700"></div>
-                <div className="h-6 w-6 rounded bg-amber-700"></div>
-              </div>
+      <div className="min-h-screen bg-[#FFF1D4]">
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-3 sm:px-4">
+          <div className="w-full max-w-xs space-y-12 sm:max-w-sm sm:space-y-16 md:max-w-md">
+            <div className="-mt-12 sm:-mt-20">
+              <Timer seconds={seconds} />
             </div>
 
-            {/* Main Game Content */}
-            <CardContent className="space-y-6 p-6">
-              {/* Timer */}
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-900 sm:text-4xl">
-                  {timer}
-                </div>
-              </div>
+            <GameStats
+              characterCount={characterCount}
+              categoryCount={categoryCount}
+            />
 
-              {/* Statistics */}
-              <div className="flex items-center justify-between">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-amber-900 sm:text-3xl">
-                    {characterCount}/100
-                  </div>
-                  <div className="text-sm text-gray-600">character count</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-amber-900 sm:text-3xl">
-                    {categoryCount}
-                  </div>
-                  <div className="text-sm text-gray-600">category count</div>
-                </div>
-              </div>
+            <div className="space-y-3 sm:space-y-4">
+              <CategoryDisplay category={currentCategory} />
 
-              {/* Category */}
-              <div className="text-center">
-                <span className="text-amber-700">Category: </span>
-                <span className="font-bold text-amber-900">
-                  {currentCategory}
-                </span>
-              </div>
-
-              {/* Input and Button */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  // Handle word submission
-                }}
-                className="space-y-4"
-              >
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <Input
-                  placeholder="Enter your word here..."
+                  placeholder={
+                    gameEnded || characterCount >= 100
+                      ? "Game finished!"
+                      : "Enter your word here..."
+                  }
                   value={word}
-                  onChange={(e) => setWord(e.target.value)}
+                  onChange={handleWordChange}
                   className="w-full"
+                  disabled={gameEnded || characterCount >= 100}
                 />
-                <Button variant="default" className="w-full" type="submit">
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={() => console.log("skip category clicked")}
+                  disabled={gameEnded || characterCount >= 100}
+                >
                   Skip Category
                 </Button>
               </form>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </>
