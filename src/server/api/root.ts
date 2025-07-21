@@ -6,6 +6,7 @@ import { wordsCategoriesRouter } from "~/server/api/routers/words-categories";
 import { invitesRouter } from "./routers/invites";
 
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { leaderboardRouter } from "./routers/leaderboard";
 
 /**
  * This is the primary router for your server.
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   auth: authRouter,
   users: usersRouter,
   groups: groupsRouter,
+  leaderboard: leaderboardRouter,
   wordCategories: wordsCategoriesRouter,
   invites: invitesRouter,
 });

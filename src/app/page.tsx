@@ -3,6 +3,8 @@ import Link from "next/link";
 import { LatestPost } from "~/app/_components/post";
 import { WordCategoryTester } from "~/app/_components/wordCategoriesTester"; // TODO: Vibe coded, can delete
 import { api, HydrateClient } from "~/trpc/server";
+import LoginPage from "./login/page";
+import Header from "./_components/header";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
@@ -11,6 +13,9 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#FFF1D4]">
+      {/* <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white"> */}
+
+      {/* <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
@@ -45,11 +50,9 @@ export default async function Home() {
               {hello ? hello.greeting : "Loading tRPC query..."}
             </p>
           </div>
-
           <LatestPost />
-          <WordCategoryTester />
-        </div>
-      </main>
+        </div> */}
+      {/* </main> */}
     </div>
   );
 }

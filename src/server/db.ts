@@ -116,3 +116,15 @@ export interface DBWordRequest {
   category: string;
   status: WordRequestStatus;
 }
+
+export interface LeaderboardUser {
+  username: string;
+  category_count: number;
+  time: number;
+}
+
+//delete after rebase with main
+export interface userGroup {
+  id: string;
+  name: string;
+}
