@@ -71,7 +71,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                <Button variant="brownPrimary" type="submit" className="w-full">
+                <Button variant="default" type="submit" className="w-full">
                   Log in
                 </Button>
               </div>

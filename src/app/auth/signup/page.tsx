@@ -102,7 +102,7 @@ export default function SignupPage() {
                     onChange={(e) => setPasswordConfirmation(e.target.value)}
                   />
                 </div>
-                <Button variant="brownPrimary" type="submit" className="w-full">
+                <Button variant="default" type="submit" className="w-full">
                   Create Account
                 </Button>
               </div>
