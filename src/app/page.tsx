@@ -1,9 +1,6 @@
 import Link from "next/link";
 
 import { LatestPost } from "~/app/_components/post";
-import { WordCategoryTester } from "~/app/_components/wordCategoriesTester"; // TODO: Vibe coded, can delete
-import { InviteTester } from "./_components/invitesTester"; // TODO: Also vibe coded, can delete
-import { GroupsTester } from "./_components/groupsTest"; // TODO: Another vibe coded thing to make adding groups easier
 import { api, HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
@@ -49,9 +46,6 @@ export default async function Home() {
           </div>
 
           <LatestPost />
-          <WordCategoryTester />
-          <GroupsTester />
-          <InviteTester />
         </div>
       </main>
     </div>
