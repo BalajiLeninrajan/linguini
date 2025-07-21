@@ -6,6 +6,7 @@ import {
   type DBInvite,
   type DBGroup,
   type DBGroupUser,
+  type DBUser,
 } from "~/server/db";
 
 // Helper function to add a member
@@ -38,20 +39,34 @@ export const invitesRouter = createTRPCRouter({
   /**
    * Send an invite to another person
    * @param groupId The id of the group
-   * @param recipientId The id of the recipient (user). The user must NOT already be in the group
+   * @param identifier Email or username. The user must NOT already be in the group
    * @throws {TRPCError} If the sender is not the group owner or the user is already in the group
    */
   send: protectedProcedure
     .input(
       z.object({
         groupId: z.number(),
-        recipientId: z.number(),
+        identifier: z.string().min(1, "Username or Email is required"),
       }),
     )
     .mutation(async ({ input, ctx }): Promise<DBInvite> => {
-      const { groupId, recipientId } = input;
+      const { identifier, groupId } = input;
       try {
         await sql`BEGIN;`;
+
+        // make sure it's a valid username or email. If so, get the id.
+        const result: Pick<DBUser, "id">[] = await sql`
+          SELECT id FROM users WHERE email = ${identifier} OR username = ${identifier}
+        `;
+
+        const recipient = result[0];
+
+        if (!recipient) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid username or email",
+          });
+        }
 
         // ensure that current user is the owner of this group
         const isOwnerCheck: DBGroupUser[] = await sql`
@@ -62,14 +77,14 @@ export const invitesRouter = createTRPCRouter({
         if (!isOwnerCheck[0]) {
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: "User is not a member or is not the owner",
+            message: "Current user is not a member or is not the owner",
           });
         }
 
         // ensure that the recipient is not already in this group
         const recipientInGroup: DBGroupUser[] = await sql`
                 SELECT * FROM group_users
-                WHERE group_id = ${groupId} AND user_id = ${recipientId}
+                WHERE group_id = ${groupId} AND user_id = ${recipient.id}
             `;
 
         if (recipientInGroup[0]) {
@@ -82,7 +97,7 @@ export const invitesRouter = createTRPCRouter({
         // insert into the invites. If there already exists an invite, this operation will fail
         const inviteInsertResult: DBInvite[] = await sql`
                 INSERT INTO invites (sender_id, recipient_id, group_id, status)
-                VALUES (${ctx.user.id}, ${recipientId}, ${groupId}, 'Pending')
+                VALUES (${ctx.user.id}, ${recipient.id}, ${groupId}, 'Pending')
                 RETURNING *
             `;
 
