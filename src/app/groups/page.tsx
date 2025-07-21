@@ -10,7 +10,7 @@ import Link from "next/link";
 export default function GroupsPage() {
   const [groups, setGroups] = useState<
     { id: number; name: string; canEdit: boolean }[]
-  >([]);
+  >();
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,

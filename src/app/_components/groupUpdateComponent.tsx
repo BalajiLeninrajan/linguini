@@ -9,6 +9,7 @@ import { api } from "~/trpc/react";
 import { type User } from "~/types";
 import Link from "next/link";
 import { toast } from "sonner"
+import { type UserInvite } from "~/server/db";
 
 export default function GroupUpdateComponent() {
   const [newGroupName, setNewGroupName] = useState("");
@@ -16,6 +17,7 @@ export default function GroupUpdateComponent() {
   const [groupMembers, setGroupMembers] = useState<User[]>([]);
   const [username, setuserName] = useState("");
   const [newMember, setNewMember] = useState("");
+  const [sentInvitations, setSentInvitations] = useState<Pick<UserInvite, "recipient_id" | "username">[]>();
   const searchParams = useSearchParams();
   const groupId = searchParams.get("groupId");
 
@@ -33,6 +35,8 @@ export default function GroupUpdateComponent() {
       enabled: !!groupId,
     },
   );
+
+  const invites = api.invites.getOutboundInvites.useQuery();
 
   const { mutate } = api.groups.update.useMutation({
     onSuccess: async () => {
@@ -55,6 +59,7 @@ export default function GroupUpdateComponent() {
 
   const { mutate: inviteHook } = api.invites.send.useMutation({
     onSuccess: async() => {
+      await invites.refetch();
       toast("You just invited someone to join your group !")
     },
     onError: (error) => {
@@ -62,6 +67,18 @@ export default function GroupUpdateComponent() {
       toast("Something went wrong, please try again!")
     }
   })
+
+  const { mutate: withdrawHook } = api.invites.withdraw.useMutation({
+    onSuccess: async() => {
+      await invites.refetch();
+      toast("You just withdrew someone from your your group !")
+    },
+    onError: (error) => {
+      console.log(error);
+      toast("Something went wrong, please try again!")
+    }
+  })
+
 
   useEffect(() => {
     if (userInfo.data) {
@@ -79,6 +96,13 @@ export default function GroupUpdateComponent() {
       setGroupMembers(updatedList);
     }
   }, [groupInfo.data]);
+
+  useEffect(() => {
+    if(invites.data){
+      setSentInvitations(invites.data);
+      console.log(invites.data);
+    }
+  }, [invites.data])
 
   const changeName = () => {
     try {
@@ -119,11 +143,23 @@ export default function GroupUpdateComponent() {
     }
   };
 
+  const withdrawInvite = (recipientId: number, recipientName: string) => {
+    try{
+      withdrawHook({
+        groupId: Number(groupId),
+        recipientId: recipientId,
+      })
+    }catch(error){
+      console.log(error);
+      toast("Something went wrong, please try again")
+    }
+  }
+
   return (
     <>
       <Header />
       <div className="flex min-h-screen items-center justify-center bg-[#FFF1D4] px-4">
-        {username && currGroupName && groupMembers ? (
+        {username && currGroupName  ? (
           <div className="mx-auto w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl">
             <Card
               variant="yellow"
@@ -151,7 +187,12 @@ export default function GroupUpdateComponent() {
                   </Button>
                 </div>
                 <div className="space-y-2">
-                  {groupMembers.length > 0 && (
+                  {(groupMembers || sentInvitations) && (
+                    <h4 className="sm:text-md text-sm font-bold text-amber-900 md:text-lg">
+                      Members:
+                    </h4>
+                  )}
+                  {groupMembers && groupMembers.length > 0 && (
                     <>
                       <h4 className="sm:text-md text-sm font-bold text-amber-900 md:text-lg">
                         Members:
@@ -162,9 +203,39 @@ export default function GroupUpdateComponent() {
                           className="flex w-1/2 justify-between rounded-full bg-white p-2 px-4"
                         >
                           <h4>{value.username}</h4>
+                          <Button
+                              variant="edit"
+                              className="h-10 rounded-full px-6"
+                            >
+                              Accepted
+                          </Button>
                           <h4
                             className="cursor-pointer"
                             onClick={() => removeMember(value.id)}
+                          >
+                            x
+                          </h4>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                  {sentInvitations && sentInvitations.length > 0 && (
+                    <>
+                      {sentInvitations.map((value, key) => (
+                        <div
+                          key={key}
+                          className="flex w-1/2 justify-between rounded-full bg-white p-2 px-4 items-center"
+                        >
+                          <h4>{value.username}</h4>
+                          <Button
+                              variant="danger"
+                              className="h-10 rounded-full px-6"
+                            >
+                              Pending
+                          </Button>
+                          <h4
+                            className="cursor-pointer"
+                            onClick={() => withdrawInvite(value.recipient_id, value.username)}
                           >
                             x
                           </h4>

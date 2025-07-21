@@ -286,11 +286,11 @@ export const invitesRouter = createTRPCRouter({
    * Get all the invites where the current user is the sender
    */
   getOutboundInvites: protectedProcedure.query(
-    async ({ ctx }): Promise<DBInvite[]> => {
+    async ({ ctx }): Promise<Pick<UserInvite, "recipient_id" | "username">[]> => {
       try {
-        const outboundInvites: DBInvite[] = await sql`
-                SELECT *
-                FROM invites
+        const outboundInvites: Pick<UserInvite, "recipient_id" | "username">[] = await sql`
+                SELECT recipient_id, users.username 
+                FROM invites JOIN users on users.id = invites.recipient_id
                 WHERE sender_id = ${ctx.user.id}
             `;
         return outboundInvites;
