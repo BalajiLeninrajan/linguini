@@ -5,7 +5,6 @@ import { cn } from "~/lib/utils";
 interface CardProps extends React.ComponentProps<"div"> {
   variant?: "default" | "yellow";
 }
-
 function Card({ className, variant = "default", ...props }: CardProps) {
   const variantClass = variant === "yellow" ? "bg-[#F6CF81] rounded-xl" : "";
   return (
