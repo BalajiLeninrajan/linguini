@@ -86,6 +86,7 @@ export default function GamePage() {
     endPlay,
     gameId,
     sampleUserId,
+    categoryCount,
   ]);
 
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function GamePage() {
         startTime: new Date(),
       });
     }
-  }, [playExists.data]);
+  }, [addPlay, playExists.data]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
