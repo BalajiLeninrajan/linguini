@@ -36,6 +36,7 @@ async function addMemberToGroup(groupId: number, userId: number) {
   }
 }
 
+
 export const invitesRouter = createTRPCRouter({
   /**
    * Send an invite to another person
@@ -285,13 +286,19 @@ export const invitesRouter = createTRPCRouter({
   /**
    * Get all the invites where the current user is the sender
    */
-  getOutboundInvites: protectedProcedure.query(
-    async ({ ctx }): Promise<Pick<UserInvite, "recipient_id" | "username">[]> => {
+  getOutboundInvites: protectedProcedure
+  .input(
+    z.object({
+        groupId: z.number(),
+      }),
+  ).query(
+    async ({ input, ctx }): Promise<Pick<UserInvite, "recipient_id" | "username">[]> => {
+      const group_id = input.groupId;
       try {
         const outboundInvites: Pick<UserInvite, "recipient_id" | "username">[] = await sql`
                 SELECT recipient_id, users.username 
                 FROM invites JOIN users on users.id = invites.recipient_id
-                WHERE sender_id = ${ctx.user.id}
+                WHERE sender_id = ${ctx.user.id} AND group_id = ${group_id}
             `;
         return outboundInvites;
       } catch (error) {

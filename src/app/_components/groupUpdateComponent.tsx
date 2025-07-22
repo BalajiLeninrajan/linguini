@@ -46,7 +46,12 @@ export default function GroupUpdateComponent() {
     },
   );
 
-  const invites = api.invites.getOutboundInvites.useQuery();
+  const invites = api.invites.getOutboundInvites.useQuery(
+    { groupId: Number(groupId) ?? -1 },
+    {
+      enabled: !!groupId,
+    },
+  );
 
   const { mutate } = api.groups.update.useMutation({
     onSuccess: async () => {
