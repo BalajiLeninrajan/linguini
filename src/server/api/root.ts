@@ -4,12 +4,12 @@ import { groupsRouter } from "~/server/api/routers/groups";
 import { usersRouter } from "~/server/api/routers/users";
 import { wordsCategoriesRouter } from "~/server/api/routers/words-categories";
 import { invitesRouter } from "./routers/invites";
-import { leaderboardRouter } from "~/server/api/routers/leaderboard";
 import { playRouter } from "~/server/api/routers/plays";
 import { wordRequestsRouter } from "~/server/api/routers/word-requests";
 
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
-
+import { leaderboardRouter } from "./routers/leaderboard";
+import { gameRouter } from "./routers/game";
 /**
  * This is the primary router for your server.
  *
@@ -24,6 +24,7 @@ export const appRouter = createTRPCRouter({
   wordCategories: wordsCategoriesRouter,
   invites: invitesRouter,
   play: playRouter,
+  game: gameRouter,
   wordRequests: wordRequestsRouter,
 });
 

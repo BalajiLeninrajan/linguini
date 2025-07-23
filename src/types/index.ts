@@ -1,4 +1,5 @@
 import type { DBUser, DBGroup } from "~/server/db";
+import type { GameModeType } from "~/server/db";
 
 export type User = Omit<DBUser, "password" | "created_at">;
 
@@ -20,6 +21,12 @@ export type userGroup = {
   name: string;
 };
 
+export type Game = {
+  gameMode: GameModeType;
+  seed: number;
+  createdAt: Date;
+};
+
 export type userInvite = {
   sender_id: number;
   recipient_id: number;
@@ -27,3 +34,4 @@ export type userInvite = {
   username: string;
   name: string;
 }
+

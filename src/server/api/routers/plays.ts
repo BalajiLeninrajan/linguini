@@ -11,7 +11,6 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
             SELECT game_id FROM plays WHERE user_id = ${userId} AND game_id = ${gameId}
         `;
     if (playExists[0]) {
-      console.log("Play already exists, not creating new one");
       return;
     }
 
@@ -20,18 +19,11 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
         `;
 
     if (!gameResult[0]) {
-      // TO DELETE -> for easier testing only
-      await sql`
-            INSERT INTO games (id, game_mode, seed, created_at)
-            VALUES (${gameId}, 'Classic', ${gameId}, NOW())
-            `;
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "Game does not exist",
       });
     }
-
-    console.log(`Creating play with gameId: ${gameId}, userId: ${userId}`);
 
     const result: boolean[] = await sql`
             INSERT INTO plays (game_id, user_id, category_count, start_time)
@@ -45,7 +37,6 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
       });
     }
     await sql`COMMIT`;
-    console.log("Play created successfully");
   } catch (error) {
     await sql`ROLLBACK`;
     console.error("Database error:", error);
@@ -61,13 +52,14 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
 
 async function playExists(gameId: number, userId: number) {
   try {
+    
     const result: Pick<DBPlay, "game_id">[] = await sql`
-            SELECT game_id FROM plays WHERE user_id = ${userId} AND game_id = ${gameId}
+            SELECT game_id FROM plays 
+            WHERE user_id = ${userId} 
+            AND game_id = ${gameId}
         `;
-    if (result[0]) {
-      return true;
-    }
-    return false;
+    
+    return result.length > 0;
   } catch (error) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
@@ -129,6 +121,7 @@ async function endPlay(
     });
   }
 }
+
 
 export const playRouter = createTRPCRouter({
   /**
@@ -192,4 +185,6 @@ export const playRouter = createTRPCRouter({
       const { gameId, userId, categoryCount, endTime } = input;
       return await endPlay(gameId, userId, categoryCount, endTime);
     }),
+
+    
 });
