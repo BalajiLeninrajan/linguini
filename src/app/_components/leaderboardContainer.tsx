@@ -1,5 +1,4 @@
 "use client";
-import type { Timestamp } from "next/dist/server/lib/cache-handlers/types";
 import type { LeaderboardUser } from "~/server/db";
 import type { TimeValue } from "~/types";
 
