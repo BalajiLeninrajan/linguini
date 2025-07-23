@@ -14,7 +14,6 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [error, setError] = useState("");
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -32,8 +31,8 @@ export default function SignupPage() {
       await currentUser.refetch();
     },
     onError: (error) => {
-      setError(error.message);
-      toast("An error has occured, please try again!");
+      toast(error.message);
+      console.error(error);
     },
   });
 
@@ -55,7 +54,7 @@ export default function SignupPage() {
         });
       } catch (e) {
         toast("An error has occured, please try again!");
-        console.log(e);
+        console.error(e);
       }
     }
   };

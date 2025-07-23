@@ -12,7 +12,6 @@ import Header from "~/app/_components/header";
 export default function LoginPage() {
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -30,8 +29,8 @@ export default function LoginPage() {
       await currentUser.refetch();
     },
     onError: (error) => {
-      setError(error.message);
-      toast("An error has occured, please try again!");
+      toast(error.message);
+      console.error(error);
     },
   });
 
@@ -45,7 +44,7 @@ export default function LoginPage() {
       });
     } catch (e) {
       toast("An error has occured, please try again!");
-      console.log(e);
+      console.error(e);
     }
   };
 
