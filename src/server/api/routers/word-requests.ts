@@ -23,7 +23,7 @@ export const wordRequestsRouter = createTRPCRouter({
         await sql`BEGIN`;
         const existing: DBWordRequest[] = await sql`
           SELECT * FROM word_requests
-          WHERE word = ${word} AND category = ${category} AND status = ${WordRequestStatus.Pending}
+          WHERE user_id = ${ctx.user.id} AND word = ${word} AND category = ${category}
         `;
         if (existing.length > 0) {
           throw new TRPCError({
