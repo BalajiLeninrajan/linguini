@@ -17,7 +17,6 @@ export default function GamePage() {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
 
-
   const { data: gameId } = api.game.getTodaysGame.useQuery();
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
@@ -48,21 +47,28 @@ export default function GamePage() {
   });
 
   // Get today's date as YYYY-MM-DD string to avoid timezone issues
-  const today = new Date().toISOString().split('T')[0]!;
-  
-  const playExists = api.play.playExists.useQuery({
-    gameId: gameId ?? 0,
-    userId: userId ?? 0,
-  }, {
-    enabled: userId !== undefined,
-    refetchOnWindowFocus: false,
-  });
+  const today = new Date().toISOString().split("T")[0]!;
+
+  const playExists = api.play.playExists.useQuery(
+    {
+      gameId: gameId ?? 0,
+      userId: userId ?? 0,
+    },
+    {
+      enabled: userId !== undefined,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   useEffect(() => {
-    if (!playExists.isLoading && playExists.data !== undefined && !gameStarted) {
+    if (
+      !playExists.isLoading &&
+      playExists.data !== undefined &&
+      !gameStarted
+    ) {
       if (playExists.data) {
         alert("You have already played this game!");
-        setGameEnded(true); 
+        setGameEnded(true);
       }
     }
   }, [playExists.data, playExists.isLoading, gameStarted]);
@@ -102,14 +108,27 @@ export default function GamePage() {
   ]);
 
   useEffect(() => {
-    if (!playExists.isLoading && playExists.data === false && gameId && userId && !gameStarted) {
+    if (
+      !playExists.isLoading &&
+      playExists.data === false &&
+      gameId &&
+      userId &&
+      !gameStarted
+    ) {
       addPlay({
         gameId: gameId,
         userId: userId,
         startTime: new Date(),
       });
     }
-  }, [playExists.data, playExists.isLoading, gameId, userId, gameStarted, addPlay]);
+  }, [
+    playExists.data,
+    playExists.isLoading,
+    gameId,
+    userId,
+    gameStarted,
+    addPlay,
+  ]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -12,11 +12,11 @@ async function getTodaysGame() {
     const existingGame: Pick<DBGame, "id">[] = await sql`
       SELECT id FROM games WHERE DATE(created_at) = CURRENT_DATE)
     `;
-    
+
     if (existingGame[0]) {
       return existingGame[0].id;
     }
-    
+
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "No game exists for today",
@@ -56,7 +56,7 @@ export const gameRouter = createTRPCRouter({
 
         const existingGameId: number = await getTodaysGame();
 
-        if(existingGameId){
+        if (existingGameId) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "A game has already been created for today",
@@ -98,8 +98,7 @@ export const gameRouter = createTRPCRouter({
    * @returns The game ID for today's game
    * @throws {TRPCError} If an unexpected error occurs
    */
-  getTodaysGame: publicProcedure
-    .query(async () => {
-      return await getTodaysGame();
-    }),
+  getTodaysGame: publicProcedure.query(async () => {
+    return await getTodaysGame();
+  }),
 });

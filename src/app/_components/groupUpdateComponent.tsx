@@ -8,11 +8,10 @@ import { useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { type User } from "~/types";
 import Link from "next/link";
-import { toast } from "sonner"
+import { toast } from "sonner";
 import { type UserInvite } from "~/server/db";
 import Alert from "./alertComponent";
 import Image from "next/image";
-
 
 export default function GroupUpdateComponent() {
   const [newGroupName, setNewGroupName] = useState("");
@@ -20,15 +19,16 @@ export default function GroupUpdateComponent() {
   const [groupMembers, setGroupMembers] = useState<User[]>([]);
   const [username, setuserName] = useState("");
   const [newMember, setNewMember] = useState("");
-  const [sentInvitations, setSentInvitations] = useState<Pick<UserInvite, "recipient_id" | "username">[]>();
+  const [sentInvitations, setSentInvitations] =
+    useState<Pick<UserInvite, "recipient_id" | "username">[]>();
   const searchParams = useSearchParams();
   const groupId = searchParams.get("groupId");
   const [showAlert, setShowAlert] = useState(false);
   const [alertContent, setAlertContent] = useState("");
   const [pendingAction, setPendingAction] = useState<null | {
-    type: 'remove' | 'withdraw',
-    memberId: number,
-    memberName: string
+    type: "remove" | "withdraw";
+    memberId: number;
+    memberName: string;
   }>(null);
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
@@ -59,7 +59,7 @@ export default function GroupUpdateComponent() {
     },
     onError: (error) => {
       console.log(error);
-      toast("Something went wrong, please try again!")
+      toast("Something went wrong, please try again!");
     },
   });
 
@@ -73,27 +73,26 @@ export default function GroupUpdateComponent() {
   });
 
   const { mutate: inviteHook } = api.invites.send.useMutation({
-    onSuccess: async() => {
+    onSuccess: async () => {
       await invites.refetch();
-      toast("You just invited someone to join your group !")
-    },
-    onError: (error) => {
-      console.log(error)
-      toast("Something went wrong, please try again!")
-    }
-  })
-
-  const { mutate: withdrawHook } = api.invites.withdraw.useMutation({
-    onSuccess: async() => {
-      await invites.refetch();
-      toast("You just withdrew someone from your your group !")
+      toast("You just invited someone to join your group !");
     },
     onError: (error) => {
       console.log(error);
-      toast("Something went wrong, please try again!")
-    }
-  })
+      toast("Something went wrong, please try again!");
+    },
+  });
 
+  const { mutate: withdrawHook } = api.invites.withdraw.useMutation({
+    onSuccess: async () => {
+      await invites.refetch();
+      toast("You just withdrew someone from your your group !");
+    },
+    onError: (error) => {
+      console.log(error);
+      toast("Something went wrong, please try again!");
+    },
+  });
 
   useEffect(() => {
     if (userInfo.data) {
@@ -113,11 +112,11 @@ export default function GroupUpdateComponent() {
   }, [groupInfo.data]);
 
   useEffect(() => {
-    if(invites.data){
+    if (invites.data) {
       setSentInvitations(invites.data);
       console.log(invites.data);
     }
-  }, [invites.data])
+  }, [invites.data]);
 
   const changeName = () => {
     try {
@@ -134,37 +133,40 @@ export default function GroupUpdateComponent() {
 
   const removeMember = (memberId: number, memberName: string) => {
     setAlertContent(`You are about to remove a member ${memberName}`);
-    setPendingAction({type: 'remove', memberName, memberId});
+    setPendingAction({ type: "remove", memberName, memberId });
     setShowAlert(true);
   };
 
   const inviteMember = (username: string) => {
     //checking if the new member is not already a member of the group
     if (!groupMembers.some((user) => user.username == username)) {
-      try{
+      try {
         inviteHook({
           groupId: Number(groupId),
           identifier: newMember,
-        })
-      }catch(error){
+        });
+      } catch (error) {
         console.log(error);
         toast("Something went wrong, please try again!");
       }
     }
   };
 
-
   const withdrawInvite = (recipientId: number, recipientName: string) => {
     setAlertContent(`You are about to uninvite a member ${recipientName}`);
-    setPendingAction({type: 'withdraw', memberName: recipientName, memberId: recipientId});
+    setPendingAction({
+      type: "withdraw",
+      memberName: recipientName,
+      memberId: recipientId,
+    });
     setShowAlert(true);
-  }
+  };
 
   return (
     <>
       <Header />
       <div className="flex min-h-screen items-center justify-center bg-[#FFF1D4] px-4">
-        {username && currGroupName  ? (
+        {username && currGroupName ? (
           <div className="mx-auto w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl">
             <Card
               variant="yellow"
@@ -206,12 +208,21 @@ export default function GroupUpdateComponent() {
                         >
                           <h4>{value.username}</h4>
                           <Button
-                              variant="edit"
-                              className="h-10 rounded-full px-6"
-                            >
-                              Accepted
+                            variant="edit"
+                            className="h-10 rounded-full px-6"
+                          >
+                            Accepted
                           </Button>
-                          <Image src="/close.svg" alt="Close" width={15} height={15} className="cursor-pointer" onClick={() => removeMember(value.id, value.username)}/>
+                          <Image
+                            src="/close.svg"
+                            alt="Close"
+                            width={15}
+                            height={15}
+                            className="cursor-pointer"
+                            onClick={() =>
+                              removeMember(value.id, value.username)
+                            }
+                          />
                         </div>
                       ))}
                     </>
@@ -221,16 +232,25 @@ export default function GroupUpdateComponent() {
                       {sentInvitations.map((value, key) => (
                         <div
                           key={key}
-                          className="flex w-1/2 justify-between rounded-full bg-white p-2 px-4 items-center"
+                          className="flex w-1/2 items-center justify-between rounded-full bg-white p-2 px-4"
                         >
                           <h4>{value.username}</h4>
                           <Button
-                              variant="danger"
-                              className="h-10 rounded-full px-6"
-                            >
-                              Pending
+                            variant="danger"
+                            className="h-10 rounded-full px-6"
+                          >
+                            Pending
                           </Button>
-                          <Image src="/close.svg" alt="Close" width={15} height={15} className="cursor-pointer" onClick={() => withdrawInvite(value.recipient_id, value.username)}/>
+                          <Image
+                            src="/close.svg"
+                            alt="Close"
+                            width={15}
+                            height={15}
+                            className="cursor-pointer"
+                            onClick={() =>
+                              withdrawInvite(value.recipient_id, value.username)
+                            }
+                          />
                         </div>
                       ))}
                     </>
@@ -269,35 +289,34 @@ export default function GroupUpdateComponent() {
         onOpenChange={setShowAlert}
         body={alertContent}
         onConfirm={() => {
-          if(!pendingAction){
+          if (!pendingAction) {
             return;
           }
 
-          if(pendingAction.type == 'withdraw'){
-            try{
-                withdrawHook({
-                  groupId: Number(groupId),
-                  recipientId: pendingAction.memberId,
-                })
-            }catch(error){
+          if (pendingAction.type == "withdraw") {
+            try {
+              withdrawHook({
+                groupId: Number(groupId),
+                recipientId: pendingAction.memberId,
+              });
+            } catch (error) {
               console.log(error);
-              toast("Something went wrong, please try again.")
+              toast("Something went wrong, please try again.");
             }
           }
 
-          if(pendingAction.type == 'remove'){
-            try{
+          if (pendingAction.type == "remove") {
+            try {
               removeMemberHook({
                 groupId: Number(groupId),
                 userId: pendingAction.memberId,
               });
-
-            }catch(error){
+            } catch (error) {
               console.log(error);
-              toast("Something went wrong, please try again.")
+              toast("Something went wrong, please try again.");
             }
           }
-          
+
           setShowAlert(false);
         }}
       />
