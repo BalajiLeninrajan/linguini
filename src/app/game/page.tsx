@@ -256,6 +256,16 @@ export default function GamePage() {
                     gameState.gameEnded || gameState.characterCount >= 100
                   }
                 />
+                <Button
+                  variant="default"
+                  className="w-full"
+                  type="submit"
+                  disabled={
+                    gameState.gameEnded || gameState.characterCount >= 100
+                  }
+                >
+                  Submit
+                </Button>
               </form>
               <Button
                 variant="default"
