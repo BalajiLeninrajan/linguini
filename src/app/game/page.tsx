@@ -51,7 +51,7 @@ export default function GamePage() {
   const today = new Date().toISOString().split('T')[0]!;
   
   const playExists = api.play.playExists.useQuery({
-    date: new Date(today), 
+    gameId: gameId ?? 0,
     userId: userId ?? 0,
   }, {
     enabled: userId !== undefined,

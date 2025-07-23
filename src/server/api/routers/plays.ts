@@ -50,14 +50,13 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
   }
 }
 
-async function playExists(date: Date, userId: number) {
+async function playExists(gameId: number, userId: number) {
   try {
-    const dateStr = date.toISOString().split('T')[0];
     
     const result: Pick<DBPlay, "game_id">[] = await sql`
             SELECT game_id FROM plays 
             WHERE user_id = ${userId} 
-            AND DATE(start_time) = ${dateStr}
+            AND game_id = ${gameId}
         `;
     
     return result.length > 0;
@@ -155,13 +154,13 @@ export const playRouter = createTRPCRouter({
   playExists: publicProcedure
     .input(
       z.object({
-        date: z.date(),
+        gameId: z.number(),
         userId: z.number(),
       }),
     )
     .query(async ({ input }) => {
-      const { date, userId } = input;
-      return await playExists(date, userId);
+      const { gameId, userId } = input;
+      return await playExists(gameId, userId);
     }),
 
   /**
