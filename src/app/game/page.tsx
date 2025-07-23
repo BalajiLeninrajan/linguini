@@ -17,23 +17,29 @@ export default function GamePage() {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameEnded, setGameEnded] = useState(false);
 
-  //TO CHANGE: for testing only
-  const sampleUserId = 1;
-  const gameId = 101;
+
+  const { data: gameId } = api.play.getTodaysGame.useQuery();
+
+  const currentUser = api.auth.currentUser.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  const userId = currentUser.data?.id;
+
+  const utils = api.useUtils();
 
   const { mutate: addPlay } = api.play.addPlay.useMutation({
     onSuccess: () => {
-      console.log("Play created successfully");
       setGameStarted(true);
+      void utils.play.playExists.invalidate();
     },
     onError: (error) => {
-      console.error("Failed to create play:", error);
+      console.error("Failed to create play:", error.message);
     },
   });
 
   const { mutate: endPlay } = api.play.endPlay.useMutation({
     onSuccess: () => {
-      console.log("Play ended successfully!");
       setGameEnded(true);
     },
     onError: (error) => {
@@ -42,18 +48,21 @@ export default function GamePage() {
   });
 
   const playExists = api.play.playExists.useQuery({
-    gameId: gameId,
-    userId: sampleUserId,
+    date: new Date(),
+    userId: userId ?? 0,
+  }, {
+    enabled: userId !== undefined,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (playExists.data !== undefined) {
+    if (!playExists.isLoading && playExists.data !== undefined) {
       if (playExists.data) {
         alert("You have already played this game!");
-        setGameEnded(true); // Prevent playing
+        setGameEnded(true); 
       }
     }
-  }, [playExists.data]);
+  }, [playExists.data, playExists.isLoading]);
 
   const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value);
@@ -72,8 +81,8 @@ export default function GamePage() {
   useEffect(() => {
     if (characterCount === 100 && gameStarted && !gameEnded) {
       endPlay({
-        gameId: gameId,
-        userId: sampleUserId,
+        gameId: gameId ?? 0,
+        userId: userId ?? 0,
         categoryCount: categoryCount,
         endTime: new Date(),
       });
@@ -85,18 +94,18 @@ export default function GamePage() {
     addPlay,
     endPlay,
     gameId,
-    sampleUserId,
+    userId,
   ]);
 
   useEffect(() => {
-    if (playExists.data === false) {
+    if (!playExists.isLoading && playExists.data === false && gameId && userId && !gameStarted) {
       addPlay({
         gameId: gameId,
-        userId: sampleUserId,
+        userId: userId,
         startTime: new Date(),
       });
     }
-  }, [playExists.data]);
+  }, [playExists.data, playExists.isLoading, gameId, userId, gameStarted]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +114,6 @@ export default function GamePage() {
       setCharacterCount(newCharacterCount);
       setCategoryCount((prev) => prev + 1);
       setWord("");
-      console.log("Word submitted, character count:", newCharacterCount);
     }
   };
 

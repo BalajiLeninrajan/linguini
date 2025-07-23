@@ -11,7 +11,6 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
             SELECT game_id FROM plays WHERE user_id = ${userId} AND game_id = ${gameId}
         `;
     if (playExists[0]) {
-      console.log("Play already exists, not creating new one");
       return;
     }
 
@@ -20,18 +19,11 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
         `;
 
     if (!gameResult[0]) {
-      // TO DELETE -> for easier testing only
-      await sql`
-            INSERT INTO games (id, game_mode, seed, created_at)
-            VALUES (${gameId}, 'Classic', ${gameId}, NOW())
-            `;
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "Game does not exist",
       });
     }
-
-    console.log(`Creating play with gameId: ${gameId}, userId: ${userId}`);
 
     const result: boolean[] = await sql`
             INSERT INTO plays (game_id, user_id, category_count, start_time)
@@ -45,7 +37,6 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
       });
     }
     await sql`COMMIT`;
-    console.log("Play created successfully");
   } catch (error) {
     await sql`ROLLBACK`;
     console.error("Database error:", error);
@@ -59,11 +50,20 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
   }
 }
 
-async function playExists(gameId: number, userId: number) {
+async function playExists(date: Date, userId: number) {
   try {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
     const result: Pick<DBPlay, "game_id">[] = await sql`
-            SELECT game_id FROM plays WHERE user_id = ${userId} AND game_id = ${gameId}
+            SELECT game_id FROM plays 
+            WHERE user_id = ${userId} 
+            AND start_time >= ${startOfDay}
+            AND start_time <= ${endOfDay}
         `;
+    
     if (result[0]) {
       return true;
     }
@@ -130,6 +130,34 @@ async function endPlay(
   }
 }
 
+async function getTodaysGame() {
+  try {
+    const today = new Date();
+    
+    const existingGame: Pick<DBGame, "id">[] = await sql`
+      SELECT id FROM games WHERE DATE(created_at) = DATE(${today})
+    `;
+    
+    if (existingGame[0]) {
+      return existingGame[0].id;
+    }
+    
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "No game exists for today",
+    });
+  } catch (error) {
+    console.error("Error getting today's game:", error);
+    if (error instanceof TRPCError) {
+      throw error;
+    }
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Failed to get today's game: ${error instanceof Error ? error.message : "Unknown error"}`,
+    });
+  }
+}
+
 export const playRouter = createTRPCRouter({
   /**
    * Creates a new play for a user in a game
@@ -161,13 +189,13 @@ export const playRouter = createTRPCRouter({
   playExists: publicProcedure
     .input(
       z.object({
-        gameId: z.number(),
+        date: z.date(),
         userId: z.number(),
       }),
     )
     .query(async ({ input }) => {
-      const { gameId, userId } = input;
-      return await playExists(gameId, userId);
+      const { date, userId } = input;
+      return await playExists(date, userId);
     }),
 
   /**
@@ -192,4 +220,16 @@ export const playRouter = createTRPCRouter({
       const { gameId, userId, categoryCount, endTime } = input;
       return await endPlay(gameId, userId, categoryCount, endTime);
     }),
+
+  /**
+   * Gets the game ID for today's game
+   * @returns The game ID for today's game
+   * @throws {TRPCError} If an unexpected error occurs
+   */
+  getTodaysGame: publicProcedure
+    .query(async () => {
+      return await getTodaysGame();
+    }),
+
+    
 });
