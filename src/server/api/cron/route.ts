@@ -29,7 +29,11 @@ export async function GET(req: NextRequest) {
     } else {
       console.log("Seed successfully set and new game successfully created.");
     }
-  } catch (error: any) {
-    console.error(`CRON JOB FAILED WITH ERROR: ${error.message}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`CRON JOB FAILED WITH ERROR: ${error.message}`);
+    } else {
+      console.error("CRON JOB FAILED WITH UNKNOWN ERROR", error);
+    }
   }
 }
