@@ -38,13 +38,13 @@ export const leaderboardRouter = createTRPCRouter({
 
         //select top 10 users
         const getTop10Users: LeaderboardUser[] = await sql`
-                    SELECT users.username, plays.category_count, (plays.end_time - plays.start_time) as time
-                    FROM plays JOIN users ON users.id = plays.user_id
-                    WHERE plays.game_id = ${gameId}
-                    ORDER BY plays.category_count ASC,
-                    (plays.end_time - plays.start_time) ASC
-                    LIMIT 10;
-                `;
+          SELECT users.username, plays.category_count, (plays.end_time - plays.start_time) as time
+          FROM plays JOIN users ON users.id = plays.user_id
+          WHERE plays.game_id = ${gameId} AND plays.end_time IS NOT NULL
+          ORDER BY plays.category_count ASC,
+          (plays.end_time - plays.start_time) ASC
+          LIMIT 10;
+        `;
 
         if (!getTop10Users) {
           throw new TRPCError({
@@ -75,10 +75,10 @@ export const leaderboardRouter = createTRPCRouter({
     .query(async () => {
       try {
         const mostRecentGame: Pick<DBGame, "id">[] = await sql`
-                    SELECT id FROM games
-                    ORDER BY created_at DESC
-                    LIMIT 1;
-                `;
+          SELECT id FROM games
+          ORDER BY created_at DESC
+          LIMIT 1;
+        `;
 
         if (!mostRecentGame[0]) {
           throw new TRPCError({
@@ -101,7 +101,7 @@ export const leaderboardRouter = createTRPCRouter({
     }),
 
   //delete this procedure after rebase with main
-  getUserGroups: publicProcedure
+  getUserGroups: protectedProcedure
     .input(
       z.object({
         userId: z.number(),
@@ -112,8 +112,8 @@ export const leaderboardRouter = createTRPCRouter({
       try {
         //check if the user id exists
         const checkUser: Pick<DBUser, "id">[] = await sql`
-                    SELECT id FROM users WHERE id=${userId}
-                `;
+          SELECT id FROM users WHERE id=${userId}
+        `;
 
         if (!checkUser[0]) {
           throw new TRPCError({
@@ -123,10 +123,10 @@ export const leaderboardRouter = createTRPCRouter({
         }
 
         const groups: userGroup[] = await sql`
-                    SELECT DISTINCT groups.id, groups.name FROM
-                    groups JOIN group_users ON group_users.group_id=groups.id
-                    WHERE group_users.user_id=${userId};
-                `;
+          SELECT DISTINCT groups.id, groups.name FROM
+          groups JOIN group_users ON group_users.group_id=groups.id
+          WHERE group_users.user_id=${userId};
+        `;
 
         if (!groups) {
           throw new TRPCError({
@@ -155,7 +155,7 @@ export const leaderboardRouter = createTRPCRouter({
    * @returns Returns rankings and results of all players in a specific group
    * @throws {TRPCError} If creation of a local leaderboard fails
    */
-  getLocalLeaderboard: publicProcedure
+  getLocalLeaderboard: protectedProcedure
     .input(
       z.object({
         groupId: z.string(),
@@ -166,13 +166,13 @@ export const leaderboardRouter = createTRPCRouter({
       const { groupId, gameId } = input;
       try {
         const groupRankings: LeaderboardUser[] = await sql`
-                        SELECT DISTINCT users.username, plays.category_count, (plays.end_time - plays.start_time) as time FROM plays 
-                        JOIN users ON users.id = plays.user_id
-                        JOIN group_users ON group_users.user_id = users.id
-                        WHERE plays.game_id = ${gameId} AND group_users.group_id = ${groupId}
-                        ORDER BY plays.category_count ASC,
-                        (plays.end_time - plays.start_time) ASC;                    `;
-
+          SELECT DISTINCT users.username, plays.category_count, (plays.end_time - plays.start_time) as time FROM plays 
+          JOIN users ON users.id = plays.user_id
+          JOIN group_users ON group_users.user_id = users.id
+          WHERE plays.game_id = ${gameId} AND plays.end_time IS NOT NULL AND group_users.group_id = ${groupId}
+          ORDER BY plays.category_count ASC,
+          (plays.end_time - plays.start_time) ASC;
+        `;
         if (!groupRankings) {
           throw new TRPCError({
             code: "NOT_FOUND",
