@@ -14,7 +14,7 @@ export default function LeaderboardContainer({ users }: UserProps) {
     }
     if (typeof time === "object" && time !== null) {
       console.log(time);
-      return time.minutes;
+      return `${time.minutes}:${time.seconds.toString().padStart(2, "0")}`;
     }
     return time;
   };
@@ -36,8 +36,8 @@ export default function LeaderboardContainer({ users }: UserProps) {
             <p className="text-xl font-bold text-amber-700">
               {value.category_count} ct.
             </p>
-            <p className="ml-8 w-5 text-xl font-bold text-amber-700">
-              {formatTime(value.time)}s
+            <p className="mr-4 ml-8 w-5 text-xl font-bold text-amber-700">
+              {formatTime(value.time)}
             </p>
           </div>
         </div>
