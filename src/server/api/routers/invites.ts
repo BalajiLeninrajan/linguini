@@ -7,6 +7,7 @@ import {
   type DBGroup,
   type DBGroupUser,
   type DBUser,
+  type UserInvite
 } from "~/server/db";
 
 // Helper function to add a member
@@ -34,6 +35,7 @@ async function addMemberToGroup(groupId: number, userId: number) {
     });
   }
 }
+
 
 export const invitesRouter = createTRPCRouter({
   /**
@@ -284,13 +286,19 @@ export const invitesRouter = createTRPCRouter({
   /**
    * Get all the invites where the current user is the sender
    */
-  getOutboundInvites: protectedProcedure.query(
-    async ({ ctx }): Promise<DBInvite[]> => {
+  getOutboundInvites: protectedProcedure
+  .input(
+    z.object({
+        groupId: z.number(),
+      }),
+  ).query(
+    async ({ input, ctx }): Promise<Pick<UserInvite, "recipient_id" | "username">[]> => {
+      const group_id = input.groupId;
       try {
-        const outboundInvites: DBInvite[] = await sql`
-                SELECT *
-                FROM invites
-                WHERE sender_id = ${ctx.user.id}
+        const outboundInvites: Pick<UserInvite, "recipient_id" | "username">[] = await sql`
+                SELECT recipient_id, users.username 
+                FROM invites JOIN users on users.id = invites.recipient_id
+                WHERE sender_id = ${ctx.user.id} AND group_id = ${group_id}
             `;
         return outboundInvites;
       } catch (error) {
@@ -310,11 +318,12 @@ export const invitesRouter = createTRPCRouter({
    * Get all the invites where the current user is the recipient
    */
   getInboundInvites: protectedProcedure.query(
-    async ({ ctx }): Promise<DBInvite[]> => {
+    async ({ ctx }): Promise<UserInvite[]> => {
       try {
-        const inboundInvites: DBInvite[] = await sql`
-                SELECT *
-                FROM invites
+        const inboundInvites: UserInvite[] = await sql`
+                SELECT sender_id, recipient_id, group_id, users.username, groups.name
+                FROM invites JOIN users on users.id = invites.sender_id
+                JOIN groups on groups.id = invites.group_id
                 WHERE recipient_id = ${ctx.user.id}
             `;
         return inboundInvites;

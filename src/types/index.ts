@@ -26,3 +26,12 @@ export type Game = {
   seed: number;
   createdAt: Date;
 };
+
+export type userInvite = {
+  sender_id: number;
+  recipient_id: number;
+  group_id: number;
+  username: string;
+  name: string;
+}
+
