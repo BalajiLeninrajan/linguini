@@ -17,7 +17,7 @@ export const wordsCategoriesRouter = createTRPCRouter({
         category: z.string().min(1, "Category is required"),
       }),
     )
-    .query(async ({ input }): Promise<boolean> => {
+    .mutation(async ({ input }): Promise<boolean> => {
       const { word, category } = input;
       try {
         const response: DBWordCategory[] = await sql`

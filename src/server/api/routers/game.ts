@@ -6,20 +6,19 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { sql, type DBGame, GameModeType } from "~/server/db";
-import type { Game } from "~/types";
 
 async function getTodaysGame() {
   try {
     const today = new Date();
-    
+
     const existingGame: Pick<DBGame, "id">[] = await sql`
       SELECT id FROM games WHERE DATE(created_at) = DATE(${today})
     `;
-    
+
     if (existingGame[0]) {
       return existingGame[0].id;
     }
-    
+
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "No game exists for today",
@@ -92,8 +91,8 @@ export const gameRouter = createTRPCRouter({
    * @returns The game ID for today's game
    * @throws {TRPCError} If an unexpected error occurs
    */
-  getTodaysGame: publicProcedure
-    .query(async () => {
-      return await getTodaysGame();
-    }),
+  getTodaysGame: publicProcedure.query(async () => {
+    return await getTodaysGame();
+  }),
 });
+

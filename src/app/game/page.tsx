@@ -7,138 +7,211 @@ import { GameStats } from "~/components/ui/game-stats";
 import { CategoryDisplay } from "~/components/ui/category-display";
 import Header from "../_components/header";
 import { api } from "~/trpc/react";
+import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default function GamePage() {
-  const [word, setWord] = useState("");
-  const [seconds, setSeconds] = useState(0);
-  const [characterCount, setCharacterCount] = useState(0);
-  const [categoryCount, setCategoryCount] = useState(0);
-  const [currentCategory, setCurrentCategory] = useState("Actor");
-  const [gameStarted, setGameStarted] = useState(false);
-  const [gameEnded, setGameEnded] = useState(false);
+  const [gameState, setGameState] = useState({
+    word: "",
+    seconds: 0,
+    characterCount: 0,
+    categoryCount: 0,
+    currentCategory: "world",
+    gameStarted: false,
+    gameEnded: false,
+  });
+
+  const { data: currentUser, isLoading: isLoadingUser } =
+    api.auth.currentUser.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+    });
 
   const { data: gameId } = api.game.getTodaysGame.useQuery();
 
-  const currentUser = api.auth.currentUser.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
+  const {
+    data: playData,
+    isLoading: isCheckingPlay,
+    refetch: refetchPlay,
+  } = api.play.playExists.useQuery(
+    {
+      gameId: gameId ?? -1,
+      userId: currentUser?.id ?? -1,
+    },
+    {
+      enabled: !!currentUser,
+    },
+  );
 
-  const userId = currentUser.data?.id;
+  const { data: categories } =
+    api.wordCategories.generateCategoriesList.useQuery();
 
-  const utils = api.useUtils();
+  useEffect(() => {
+    if (playData) {
+      setGameState((prev) => ({
+        ...prev,
+        gameStarted: true,
+      }));
+
+      if (playData.end_time) {
+        setGameState((prev) => ({
+          ...prev,
+          gameEnded: true,
+          categoryCount: playData.category_count,
+          characterCount: 100,
+          seconds: Math.floor(
+            ((playData.end_time?.getTime() ?? 0) -
+              playData.start_time.getTime()) /
+              1000,
+          ),
+        }));
+      }
+    }
+  }, [playData]);
 
   const { mutate: addPlay } = api.play.addPlay.useMutation({
     onSuccess: () => {
-      setGameStarted(true);
-      void utils.play.playExists.invalidate();
-    },
-    onError: (error) => {
-      console.error("Failed to create play:", error.message);
+      setGameState((prev) => ({ ...prev, gameStarted: true }));
     },
   });
 
   const { mutate: endPlay } = api.play.endPlay.useMutation({
     onSuccess: () => {
-      setGameEnded(true);
-    },
-    onError: (error) => {
-      console.error("Failed to end play:", error);
+      setGameState((prev) => ({ ...prev, gameEnded: true }));
     },
   });
 
-  // Get today's date as YYYY-MM-DD string to avoid timezone issues
-  const today = new Date().toISOString().split("T")[0]!;
-
-  const playExists = api.play.playExists.useQuery(
-    {
-      gameId: gameId ?? 0,
-      userId: userId ?? 0,
+  const { mutate: verifyWord } = api.wordCategories.verify.useMutation({
+    onSuccess: (result) => {
+      if (result) {
+        const newCharacterCount = Math.min(
+          gameState.characterCount + gameState.word.length,
+          100,
+        );
+        setGameState((prev) => ({
+          ...prev,
+          characterCount: newCharacterCount,
+          categoryCount: prev.categoryCount + 1,
+        }));
+      } else {
+        toast("Invalid word");
+      }
+      setGameState((prev) => ({
+        ...prev,
+        word: "",
+      }));
     },
-    {
-      enabled: userId !== undefined,
-      refetchOnWindowFocus: false,
-    },
-  );
+  });
 
   useEffect(() => {
-    if (
-      !playExists.isLoading &&
-      playExists.data !== undefined &&
-      !gameStarted
-    ) {
-      if (playExists.data) {
-        alert("You have already played this game!");
-        setGameEnded(true);
-      }
+    if (!isLoadingUser && !currentUser) {
+      redirect("/auth/login");
     }
-  }, [playExists.data, playExists.isLoading, gameStarted]);
+  }, [currentUser, isLoadingUser]);
 
-  const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWord(e.target.value);
-  };
-
+  // Handle timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (gameStarted && !gameEnded && characterCount < 100) {
+    if (
+      gameState.gameStarted &&
+      !gameState.gameEnded &&
+      gameState.characterCount < 100
+    ) {
       interval = setInterval(() => {
-        setSeconds((prev) => prev + 1);
+        setGameState((prev) => ({ ...prev, seconds: prev.seconds + 1 }));
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [gameStarted, gameEnded, characterCount]);
+  }, [gameState.gameStarted, gameState.gameEnded, gameState.characterCount]);
 
+  // Handle game completion
   useEffect(() => {
-    if (characterCount === 100 && gameStarted && !gameEnded) {
-      endPlay({
-        gameId: gameId ?? 0,
-        userId: userId ?? 0,
-        categoryCount: categoryCount,
-        endTime: new Date(),
-      });
-    }
-  }, [
-    characterCount,
-    gameStarted,
-    gameEnded,
-    addPlay,
-    endPlay,
-    gameId,
-    userId,
-    categoryCount,
-  ]);
+    const handleEndGame = async () => {
+      if (
+        gameState.characterCount === 100 &&
+        gameState.gameStarted &&
+        !gameState.gameEnded &&
+        currentUser
+      ) {
+        await refetchPlay();
+        endPlay({
+          gameId: gameId ?? -1,
+          userId: currentUser.id,
+          categoryCount: gameState.categoryCount,
+          endTime: playData
+            ? new Date(playData.start_time.getTime() + gameState.seconds * 1000)
+            : new Date(0),
+        });
+      }
+    };
+    handleEndGame().catch((error) => {
+      console.error("Error ending game:", error);
+      toast("Something went wrong 😭");
+    });
+  }, [gameState, currentUser, endPlay, playData, refetchPlay, gameId]);
 
-  useEffect(() => {
-    if (
-      !playExists.isLoading &&
-      playExists.data === false &&
-      gameId &&
-      userId &&
-      !gameStarted
-    ) {
-      addPlay({
-        gameId: gameId,
-        userId: userId,
-        startTime: new Date(),
-      });
-    }
-  }, [
-    playExists.data,
-    playExists.isLoading,
-    gameId,
-    userId,
-    gameStarted,
-    addPlay,
-  ]);
+  if (!categories || !gameId) {
+    return (
+      <>
+        <Header />
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[#FFF1D4]">
+          <h1>unable to load game :(</h1>
+        </div>
+      </>
+    );
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleWordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (word.trim() && !gameEnded && characterCount < 100) {
-      const newCharacterCount = Math.min(characterCount + word.length, 100);
-      setCharacterCount(newCharacterCount);
-      setCategoryCount((prev) => prev + 1);
-      setWord("");
-    }
+    const word = gameState.word.trim();
+    verifyWord({
+      word: word,
+      category:
+        categories[gameState.categoryCount % categories.length]?.category ??
+        " ",
+    });
   };
+
+  if (isLoadingUser || isCheckingPlay) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#FFF1D4]">
+        Loading...
+      </div>
+    );
+  }
+
+  if (
+    !gameState.gameStarted &&
+    !gameState.gameEnded &&
+    !isLoadingUser &&
+    !isCheckingPlay &&
+    !playData
+  ) {
+    return (
+      <>
+        <Header />
+        <div className="flex min-h-screen flex-col items-center justify-center bg-[#FFF1D4]">
+          <Button
+            className="mt-8"
+            onClick={() => {
+              if (currentUser) {
+                setGameState((prev) => ({
+                  ...prev,
+                  gameStarted: true,
+                }));
+                addPlay({
+                  gameId,
+                  userId: currentUser.id,
+                  startTime: new Date(),
+                });
+              }
+            }}
+          >
+            Start Game
+          </Button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -147,38 +220,58 @@ export default function GamePage() {
         <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-3 sm:px-4">
           <div className="w-full max-w-xs space-y-12 sm:max-w-sm sm:space-y-16 md:max-w-md">
             <div className="-mt-12 sm:-mt-20">
-              <Timer seconds={seconds} />
+              <Timer seconds={gameState.seconds} />
             </div>
 
             <GameStats
-              characterCount={characterCount}
-              categoryCount={categoryCount}
+              characterCount={gameState.characterCount}
+              categoryCount={gameState.categoryCount}
             />
 
             <div className="space-y-3 sm:space-y-4">
-              <CategoryDisplay category={currentCategory} />
-
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              {!gameState.gameEnded && (
+                <CategoryDisplay
+                  category={
+                    categories[gameState.categoryCount % categories.length]
+                      ?.category ?? "sorry we messed up :("
+                  }
+                />
+              )}
+              <form
+                onSubmit={handleWordSubmit}
+                className="space-y-4 sm:space-y-6"
+              >
                 <Input
                   placeholder={
-                    gameEnded || characterCount >= 100
+                    gameState.gameEnded || gameState.characterCount >= 100
                       ? "Game finished!"
                       : "Enter your word here..."
                   }
-                  value={word}
-                  onChange={handleWordChange}
+                  value={gameState.word}
+                  onChange={(e) =>
+                    setGameState((prev) => ({ ...prev, word: e.target.value }))
+                  }
                   className="w-full"
-                  disabled={gameEnded || characterCount >= 100}
+                  disabled={
+                    gameState.gameEnded || gameState.characterCount >= 100
+                  }
                 />
-                <Button
-                  variant="default"
-                  className="w-full"
-                  onClick={() => console.log("skip category clicked")}
-                  disabled={gameEnded || characterCount >= 100}
-                >
-                  Skip Category
-                </Button>
               </form>
+              <Button
+                variant="default"
+                className="w-full"
+                onClick={() =>
+                  setGameState((prev) => ({
+                    ...prev,
+                    categoryCount: prev.categoryCount + 1,
+                  }))
+                }
+                disabled={
+                  gameState.gameEnded || gameState.characterCount >= 100
+                }
+              >
+                Skip Category
+              </Button>
             </div>
           </div>
         </div>

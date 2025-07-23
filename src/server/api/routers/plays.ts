@@ -52,15 +52,17 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
 
 async function playExists(gameId: number, userId: number) {
   try {
-    
-    const result: Pick<DBPlay, "game_id">[] = await sql`
-            SELECT game_id FROM plays 
-            WHERE user_id = ${userId} 
-            AND game_id = ${gameId}
-        `;
-    
-    return result.length > 0;
+    const result: DBPlay[] = await sql`
+      SELECT * FROM plays WHERE user_id = ${userId} AND game_id = ${gameId}
+    `;
+    if (!result[0]) {
+      return null;
+    }
+    return result[0];
   } catch (error) {
+    if (error instanceof TRPCError) {
+      throw error;
+    }
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: "An unexpected error occurred",
@@ -121,7 +123,6 @@ async function endPlay(
     });
   }
 }
-
 
 export const playRouter = createTRPCRouter({
   /**
@@ -185,6 +186,4 @@ export const playRouter = createTRPCRouter({
       const { gameId, userId, categoryCount, endTime } = input;
       return await endPlay(gameId, userId, categoryCount, endTime);
     }),
-
-    
 });
