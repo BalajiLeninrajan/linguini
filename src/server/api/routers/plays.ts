@@ -52,22 +52,15 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
 
 async function playExists(date: Date, userId: number) {
   try {
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    const dateStr = date.toISOString().split('T')[0];
     
     const result: Pick<DBPlay, "game_id">[] = await sql`
             SELECT game_id FROM plays 
             WHERE user_id = ${userId} 
-            AND start_time >= ${startOfDay}
-            AND start_time <= ${endOfDay}
+            AND DATE(start_time) = ${dateStr}
         `;
     
-    if (result[0]) {
-      return true;
-    }
-    return false;
+    return result.length > 0;
   } catch (error) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
@@ -130,33 +123,6 @@ async function endPlay(
   }
 }
 
-async function getTodaysGame() {
-  try {
-    const today = new Date();
-    
-    const existingGame: Pick<DBGame, "id">[] = await sql`
-      SELECT id FROM games WHERE DATE(created_at) = DATE(${today})
-    `;
-    
-    if (existingGame[0]) {
-      return existingGame[0].id;
-    }
-    
-    throw new TRPCError({
-      code: "NOT_FOUND",
-      message: "No game exists for today",
-    });
-  } catch (error) {
-    console.error("Error getting today's game:", error);
-    if (error instanceof TRPCError) {
-      throw error;
-    }
-    throw new TRPCError({
-      code: "INTERNAL_SERVER_ERROR",
-      message: `Failed to get today's game: ${error instanceof Error ? error.message : "Unknown error"}`,
-    });
-  }
-}
 
 export const playRouter = createTRPCRouter({
   /**
@@ -219,16 +185,6 @@ export const playRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       const { gameId, userId, categoryCount, endTime } = input;
       return await endPlay(gameId, userId, categoryCount, endTime);
-    }),
-
-  /**
-   * Gets the game ID for today's game
-   * @returns The game ID for today's game
-   * @throws {TRPCError} If an unexpected error occurs
-   */
-  getTodaysGame: publicProcedure
-    .query(async () => {
-      return await getTodaysGame();
     }),
 
     

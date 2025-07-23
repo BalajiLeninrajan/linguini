@@ -18,7 +18,7 @@ export default function GamePage() {
   const [gameEnded, setGameEnded] = useState(false);
 
 
-  const { data: gameId } = api.play.getTodaysGame.useQuery();
+  const { data: gameId } = api.game.getTodaysGame.useQuery();
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -47,8 +47,11 @@ export default function GamePage() {
     },
   });
 
+  // Get today's date as YYYY-MM-DD string to avoid timezone issues
+  const today = new Date().toISOString().split('T')[0]!;
+  
   const playExists = api.play.playExists.useQuery({
-    date: new Date(),
+    date: new Date(today), 
     userId: userId ?? 0,
   }, {
     enabled: userId !== undefined,
@@ -56,13 +59,13 @@ export default function GamePage() {
   });
 
   useEffect(() => {
-    if (!playExists.isLoading && playExists.data !== undefined) {
+    if (!playExists.isLoading && playExists.data !== undefined && !gameStarted) {
       if (playExists.data) {
         alert("You have already played this game!");
         setGameEnded(true); 
       }
     }
-  }, [playExists.data, playExists.isLoading]);
+  }, [playExists.data, playExists.isLoading, gameStarted]);
 
   const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value);
