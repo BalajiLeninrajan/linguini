@@ -14,6 +14,8 @@ export default function LeaderboardContainer({ users }: UserProps) {
     }
     if (typeof time === "object" && time !== null) {
       console.log(time);
+      if (!time.seconds) return "0:00";
+      if (!time.minutes) return `0:${time.seconds.toString().padStart(2, "0")}`;
       return `${time.minutes}:${time.seconds.toString().padStart(2, "0")}`;
     }
     return time;
