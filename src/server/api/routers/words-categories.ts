@@ -21,20 +21,20 @@ export const wordsCategoriesRouter = createTRPCRouter({
       const { word, category } = input;
       try {
         const response: DBWordCategory[] = await sql`
-                WITH RECURSIVE
-                Search(word, category, depth) AS (
-                    SELECT word, category, 0 from word_categories WHERE word = ${word}
+            WITH RECURSIVE
+            Search(word, category, depth) AS (
+                SELECT word, category, 0 from word_categories WHERE word = ${word}
 
-                    UNION
+                UNION
 
-                    SELECT s.word, wc.category, s.depth + 1
-                    FROM search s, word_categories wc
-                    WHERE s.category = wc.word AND s.word != wc.category AND s.depth < 5
-                )
-                SELECT *
-                FROM search
-                WHERE word = ${word} AND category = ${category}
-            `;
+                SELECT s.word, wc.category, s.depth + 1
+                FROM search s, word_categories wc
+                WHERE s.category = wc.word AND s.word != wc.category AND s.depth < 5
+            )
+            SELECT *
+            FROM search
+            WHERE word = ${word} AND category = ${category}
+        `;
         return response.length != 0;
       } catch (error) {
         if (error instanceof TRPCError) {
