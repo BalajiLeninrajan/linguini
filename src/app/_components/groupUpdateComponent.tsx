@@ -199,9 +199,6 @@ export default function GroupUpdateComponent() {
                   )}
                   {groupMembers && groupMembers.length > 0 && (
                     <>
-                      <h4 className="sm:text-md text-sm font-bold text-amber-900 md:text-lg">
-                        Members:
-                      </h4>
                       {groupMembers.map((value, key) => (
                         <div
                           key={key}
