@@ -6,6 +6,7 @@ import { wordsCategoriesRouter } from "~/server/api/routers/words-categories";
 import { invitesRouter } from "./routers/invites";
 import { leaderboardRouter } from "~/server/api/routers/leaderboard";
 import { playRouter } from "~/server/api/routers/plays";
+import { wordRequestsRouter } from "~/server/api/routers/word-requests";
 
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   wordCategories: wordsCategoriesRouter,
   invites: invitesRouter,
   play: playRouter,
+  wordRequests: wordRequestsRouter,
 });
 
 // export type definition of API
