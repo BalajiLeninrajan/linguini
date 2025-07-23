@@ -6,14 +6,11 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { sql, type DBGame, GameModeType } from "~/server/db";
-import type { Game } from "~/types";
 
 async function getTodaysGame() {
   try {
-    const today = new Date();
-    
     const existingGame: Pick<DBGame, "id">[] = await sql`
-      SELECT id FROM games WHERE DATE(created_at) = DATE(${today})
+      SELECT id FROM games WHERE DATE(created_at) = CURRENT_DATE)
     `;
     
     if (existingGame[0]) {
@@ -50,16 +47,25 @@ export const gameRouter = createTRPCRouter({
       z.object({
         gameMode: z.nativeEnum(GameModeType),
         seed: z.number(),
-        createdAt: z.date(),
       }),
     )
     .mutation(async ({ input }): Promise<DBGame> => {
-      const { gameMode, seed, createdAt } = input;
+      const { gameMode, seed } = input;
       try {
         await sql`BEGIN`;
+
+        const existingGameId: number = await getTodaysGame();
+
+        if(existingGameId){
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "A game has already been created for today",
+          });
+        }
+
         const gameInsertResult: DBGame[] = await sql`
-          INSERT INTO games (game_mode, seed, created_at)
-          VALUES (${gameMode}, ${seed}, ${createdAt})
+          INSERT INTO games (game_mode, seed)
+          VALUES (${gameMode}, ${seed})
           RETURNING id, game_mode, seed, created_at
         `;
 
