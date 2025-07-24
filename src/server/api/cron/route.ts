@@ -11,7 +11,7 @@ async function createGame(seed: number, gameMode: GameModeType = GameModeType.Cl
         await sql`BEGIN`;
 
         const existingGame: DBGame[] = await sql`
-            SELECT * FROM games WHERE DATE(created_at) = CURRENT_DATE)
+            SELECT * FROM games WHERE DATE(created_at) = CURRENT_DATE
         `;
 
         if (existingGame[0]) {
