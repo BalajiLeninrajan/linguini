@@ -7,79 +7,96 @@ import { api } from "~/trpc/react"; // adjust to your client path
 export function WordCategoryTester() {
   const [word, setWord] = useState("");
   const [category, setCategory] = useState("");
+  const [seed, setSeed] = useState(0.5);
 
-  const [result, setResult] = useState<string | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
-
-  const createQuery = api.wordCategories.verify.useQuery(
+  const verifyQuery = api.wordCategories.verify.useQuery(
     { word, category },
-    { enabled: false }, // disable auto-run
+    { enabled: false }
   );
 
-  const generateMutation = api.wordCategories.generateCategoriesList.useQuery();
+  const generateQuery = api.wordCategories.generateCategoriesList.useQuery(
+    { seed },
+    { enabled: false }
+  );
 
-  const handleCheckMatch = async () => {
-    try {
-      const res = await createQuery.refetch();
-      setResult(res.data ? "✅ Match found" : "❌ No match");
-    } catch (err) {
-      console.error(err);
-      setResult("⚠️ Error occurred");
-    }
+  const handleVerify = async () => {
+    verifyQuery.refetch();
   };
 
-  const handleGenerateCategories = async () => {
-    try {
-      const res = generateMutation.data ?? [];
-      setCategories(res.map((c) => c.category));
-    } catch (err) {
-      console.error(err);
-      setCategories([]);
-    }
+  const handleGenerate = async () => {
+    generateQuery.refetch();
   };
 
   return (
-    <div className="mx-auto max-w-xl space-y-6 p-4">
-      <h2 className="text-2xl font-semibold">Word Category Tester</h2>
+    <div className="p-6 max-w-2xl mx-auto space-y-8">
+      <h1 className="text-2xl font-bold">Word Category API Tester</h1>
 
-      <div className="space-y-2">
+      {/* --- VERIFY --- */}
+      <div className="border p-4 rounded-xl shadow">
+        <h2 className="text-xl font-semibold mb-2">Verify Word in Category</h2>
         <input
-          className="w-full border p-2"
           type="text"
-          placeholder="Enter word"
+          placeholder="Word"
           value={word}
           onChange={(e) => setWord(e.target.value)}
+          className="border p-2 rounded w-full mb-2"
         />
         <input
-          className="w-full border p-2"
           type="text"
-          placeholder="Enter category"
+          placeholder="Category"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+          className="border p-2 rounded w-full mb-4"
         />
         <button
-          className="rounded bg-blue-500 px-4 py-2 text-white"
-          onClick={handleCheckMatch}
+          onClick={handleVerify}
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
         >
-          Check Match
+          Test Verify
         </button>
-        {result && <p className="mt-2 text-lg">{result}</p>}
+        {verifyQuery.isFetching && <p className="text-gray-500 mt-2">Loading...</p>}
+        {verifyQuery.isSuccess && (
+          <p className="mt-2">
+            ✅ Result:{" "}
+            <strong>
+              {verifyQuery.data ? "True (Match found)" : "False (No match)"}
+            </strong>
+          </p>
+        )}
+        {verifyQuery.error && (
+          <p className="text-red-500 mt-2">Error: {verifyQuery.error.message}</p>
+        )}
       </div>
 
-      <hr />
-
-      <div className="space-y-2">
+      {/* --- GENERATE --- */}
+      <div className="border p-4 rounded-xl shadow">
+        <h2 className="text-xl font-semibold mb-2">Generate Category List</h2>
+        <input
+          type="number"
+          step="0.01"
+          min={0}
+          max={0.99}
+          value={seed}
+          onChange={(e) => setSeed(Number(e.target.value))}
+          className="border p-2 rounded w-full mb-4"
+        />
         <button
-          className="rounded bg-green-500 px-4 py-2 text-white"
-          onClick={handleGenerateCategories}
+          onClick={handleGenerate}
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
         >
           Generate Categories
         </button>
-        <ul className="mt-2 ml-6 list-disc">
-          {categories.map((cat, idx) => (
-            <li key={idx}>{cat}</li>
-          ))}
-        </ul>
+        {generateQuery.isFetching && <p className="text-gray-500 mt-2">Loading...</p>}
+        {generateQuery.isSuccess && (
+          <ul className="mt-2 list-disc list-inside">
+            {generateQuery.data.map((c, i) => (
+              <li key={i}>{c.category}</li>
+            ))}
+          </ul>
+        )}
+        {generateQuery.error && (
+          <p className="text-red-500 mt-2">Error: {generateQuery.error.message}</p>
+        )}
       </div>
     </div>
   );

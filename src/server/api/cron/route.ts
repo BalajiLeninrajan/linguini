@@ -1,6 +1,5 @@
 import { GameModeType, sql, type DBGame } from "~/server/db";
 import type { NextRequest } from "next/server";
-import { TRPCError } from "@trpc/server";
 
 /**
  * A helper function that creates a new game 
