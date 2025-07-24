@@ -3,12 +3,12 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "~/server/api/trpc";
-import { sql, type DBGame, GameModeType } from "~/server/db";
+import { sql, type DBGame } from "~/server/db";
 
 async function getTodaysGame() {
   try {
     const existingGame: Pick<DBGame, "id">[] = await sql`
-      SELECT id FROM games WHERE DATE(created_at) = CURRENT_DATE)
+      SELECT id FROM games WHERE DATE(created_at) = CURRENT_DATE
     `;
 
     if (existingGame[0]) {
