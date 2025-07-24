@@ -29,7 +29,7 @@ export default function LeaderboardContainer({ users }: UserProps) {
         >
           <div className="flex w-1/4 flex-row justify-between">
             <p className="text-xl font-bold text-yellow-600">{key + 1}</p>
-            <p className="ml-auto w-1/2 text-left text-xl text-gray-600">
+            <p className="ml-auto w-1/2 text-left text-xl whitespace-nowrap text-gray-600">
               {value.username}
             </p>
           </div>
