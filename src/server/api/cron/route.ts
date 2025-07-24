@@ -1,39 +1,68 @@
-import { gameRouter } from "~/server/api/routers/game";
-import { createTRPCContext } from "~/server/api/trpc"; // context creator
 import { GameModeType, sql, type DBGame } from "~/server/db";
 import type { NextRequest } from "next/server";
+import { TRPCError } from "@trpc/server";
+
+/**
+ * A helper function that creates a new game 
+ * @param seed The seed that generates the categories list
+ * @param gameMode The game mode. Defaults to 'Classic'
+ */
+async function createGame(seed: number, gameMode: GameModeType = GameModeType.Classic): Promise<DBGame | null> {
+    try {
+        await sql`BEGIN`;
+
+        const existingGame: DBGame[] = await sql`
+            SELECT * FROM games WHERE DATE(created_at) = CURRENT_DATE)
+        `;
+
+        if (existingGame[0]) {
+            console.warn("WARNING: A game has already been created for today");
+            await sql`ROLLBACK`;
+            return null;
+        }
+
+        const gameInsertResult: DBGame[] = await sql`
+            INSERT INTO games (game_mode, seed)
+            VALUES (${gameMode}, ${seed})
+            RETURNING id, game_mode, seed, created_at
+        `;
+
+        const newGame = gameInsertResult[0];
+        if (!newGame) {
+            throw new Error("Failed to insert game.")
+        }
+
+        await sql`COMMIT`;
+        return newGame;
+    } catch (error) {
+        await sql`ROLLBACK`;
+        throw new Error("createGame() failed: " + (error instanceof Error));
+    }
+}
+
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-
-  // secure the cron job
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
   try {
-    const newSeed: number = parseFloat(Math.random().toFixed(8)) * 100000000;
+    const seed: number = parseFloat(Math.random().toFixed(8));
 
-    await sql`SELECT SETSEED(${newSeed})`;
+    await sql`SELECT SETSEED(${seed})`;
 
-    const ctx = await createTRPCContext({ headers: req.headers });
+    const dbSeed: number = seed * 100000000;
 
-    const newGame: DBGame = await gameRouter.createCaller(ctx).createGame({
-      gameMode: GameModeType.Classic,
-      seed: newSeed,
-    });
+    const game = await createGame(dbSeed);
 
-    if (!newGame) {
-      // failed
-      console.error("Failed to create a new game");
-    } else {
-      console.log("Seed successfully set and new game successfully created.");
+    if (!game) {
+      console.warn("Game already exists for today. Skipping new creation.");
+      return new Response("Game already exists for today.", { status: 200 });
     }
+
+    console.log(`Seed ${dbSeed} successfully set and new game successfully created.`);
+    
+    return new Response("New game created", { status: 200 });
+
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(`CRON JOB FAILED WITH ERROR: ${error.message}`);
-    } else {
-      console.error("CRON JOB FAILED WITH UNKNOWN ERROR", error);
-    }
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Cron job failed:", message);
+    return new Response("Internal server error", { status: 500 });
   }
 }
