@@ -80,6 +80,16 @@ export default function GamePage() {
     },
   });
 
+  const { mutate: requestWordHook } = api.wordRequests.create.useMutation({
+    onSuccess: () => {
+      toast("You have requested to add a new word to the game!");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast("Something went wrong, please try again!");
+    },
+  });
+
   const { mutate: verifyWord } = api.wordCategories.verify.useMutation({
     onSuccess: (result) => {
       if (result) {
@@ -93,7 +103,26 @@ export default function GamePage() {
           categoryCount: prev.categoryCount + 1,
         }));
       } else {
-        toast("Invalid word");
+        toast("Invalid word", {
+          action: {
+            label: "Request Word",
+            onClick: () => {
+              try {
+                if (!categories) {
+                  throw new Error();
+                }
+                requestWordHook({
+                  word: gameState.word,
+                  category:
+                    categories[gameState.categoryCount % categories?.length]
+                      ?.category ?? "",
+                });
+              } catch {
+                toast("Error adding word, please try again");
+              }
+            },
+          },
+        });
       }
       setGameState((prev) => ({
         ...prev,
