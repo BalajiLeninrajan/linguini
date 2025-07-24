@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { sql, type DBWordCategory, type DBCategory } from "~/server/db";
 
+
 export const wordsCategoriesRouter = createTRPCRouter({
   /**
    * Verify if the word entered by the user matches the category
@@ -48,12 +49,19 @@ export const wordsCategoriesRouter = createTRPCRouter({
     }),
 
   /**
-   * Generate category list from the seed
+   * Generate category list from the game seed
    * @throws {TRPCError} If something goes wrong
    */
-  generateCategoriesList: publicProcedure.query(
-    async (): Promise<DBCategory[]> => {
+  generateCategoriesList: publicProcedure
+  .input(
+      z.object({
+        seed: z.number().min(0).lt(1)
+      }),
+    ).query(
+    async ({input}): Promise<DBCategory[]> => {
+      const {seed} = input;
       try {
+        await sql`SELECT SETSEED(${seed})`
         const categoriesList: DBCategory[] = await sql`
             SELECT category
             FROM categories

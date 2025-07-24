@@ -52,13 +52,12 @@ async function createPlay(gameId: number, userId: number, startTime: Date) {
 
 async function playExists(gameId: number, userId: number) {
   try {
-    
     const result: Pick<DBPlay, "game_id">[] = await sql`
             SELECT game_id FROM plays 
             WHERE user_id = ${userId} 
             AND game_id = ${gameId}
         `;
-    
+
     return result.length > 0;
   } catch (error) {
     throw new TRPCError({
@@ -122,7 +121,6 @@ async function endPlay(
   }
 }
 
-
 export const playRouter = createTRPCRouter({
   /**
    * Creates a new play for a user in a game
@@ -185,6 +183,4 @@ export const playRouter = createTRPCRouter({
       const { gameId, userId, categoryCount, endTime } = input;
       return await endPlay(gameId, userId, categoryCount, endTime);
     }),
-
-    
 });

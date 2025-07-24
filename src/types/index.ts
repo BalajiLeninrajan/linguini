@@ -33,5 +33,4 @@ export type userInvite = {
   group_id: number;
   username: string;
   name: string;
-}
-
+};

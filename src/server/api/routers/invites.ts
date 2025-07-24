@@ -7,7 +7,7 @@ import {
   type DBGroup,
   type DBGroupUser,
   type DBUser,
-  type UserInvite
+  type UserInvite,
 } from "~/server/db";
 
 // Helper function to add a member
@@ -35,7 +35,6 @@ async function addMemberToGroup(groupId: number, userId: number) {
     });
   }
 }
-
 
 export const invitesRouter = createTRPCRouter({
   /**
@@ -287,32 +286,39 @@ export const invitesRouter = createTRPCRouter({
    * Get all the invites where the current user is the sender
    */
   getOutboundInvites: protectedProcedure
-  .input(
-    z.object({
+    .input(
+      z.object({
         groupId: z.number(),
       }),
-  ).query(
-    async ({ input, ctx }): Promise<Pick<UserInvite, "recipient_id" | "username">[]> => {
-      const group_id = input.groupId;
-      try {
-        const outboundInvites: Pick<UserInvite, "recipient_id" | "username">[] = await sql`
+    )
+    .query(
+      async ({
+        input,
+        ctx,
+      }): Promise<Pick<UserInvite, "recipient_id" | "username">[]> => {
+        const group_id = input.groupId;
+        try {
+          const outboundInvites: Pick<
+            UserInvite,
+            "recipient_id" | "username"
+          >[] = await sql`
                 SELECT recipient_id, users.username 
                 FROM invites JOIN users on users.id = invites.recipient_id
                 WHERE sender_id = ${ctx.user.id} AND group_id = ${group_id}
             `;
-        return outboundInvites;
-      } catch (error) {
-        if (error instanceof TRPCError) {
-          throw error;
-        }
+          return outboundInvites;
+        } catch (error) {
+          if (error instanceof TRPCError) {
+            throw error;
+          }
 
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred",
-        });
-      }
-    },
-  ),
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "An unexpected error occurred",
+          });
+        }
+      },
+    ),
 
   /**
    * Get all the invites where the current user is the recipient

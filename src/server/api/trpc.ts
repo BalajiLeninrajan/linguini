@@ -43,6 +43,10 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
   };
 };
 
+export const createInnerTRPCContext = async () => {
+  return { session: null };
+};
+
 /**
  * 2. INITIALIZATION
  *
