@@ -7,6 +7,7 @@ import { GameStats } from "~/components/ui/game-stats";
 import { CategoryDisplay } from "~/components/ui/category-display";
 import Header from "../_components/header";
 import { api } from "~/trpc/react";
+import { toast } from "sonner";
 
 export default function GamePage() {
   const [word, setWord] = useState("");
@@ -34,6 +35,7 @@ export default function GamePage() {
     },
     onError: (error) => {
       console.error("Failed to create play:", error.message);
+      toast("Something went wrong, please try again!");
     },
   });
 
@@ -43,8 +45,19 @@ export default function GamePage() {
     },
     onError: (error) => {
       console.error("Failed to end play:", error);
+      toast("Something went wrong, please try again!");
     },
   });
+
+  const { mutate:requestWordHook } = api.wordRequests.create.useMutation({
+    onSuccess:() => {
+      toast("You have requested to add a new word to the game!");
+    },
+    onError: (error) => {
+      console.error(error);
+      toast("Something went wrong, please try again!");
+    },
+  })
 
   // Get today's date as YYYY-MM-DD string to avoid timezone issues
   const today = new Date().toISOString().split("T")[0]!;
@@ -140,6 +153,18 @@ export default function GamePage() {
     }
   };
 
+  const requestToAddWord = (word:string, category:string) => {
+    try{
+      requestWordHook({
+        word: word,
+        category: category,
+      })
+    }catch(error){
+      console.log(error);
+      toast("Something went wrong, please try again!");
+    }
+  }
+
   return (
     <>
       <Header />
@@ -177,6 +202,14 @@ export default function GamePage() {
                   disabled={gameEnded || characterCount >= 100}
                 >
                   Skip Category
+                </Button>
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={() => requestToAddWord(word, currentCategory)}
+                  disabled={gameEnded || characterCount >= 100}
+                >
+                  Request To Add Word
                 </Button>
               </form>
             </div>

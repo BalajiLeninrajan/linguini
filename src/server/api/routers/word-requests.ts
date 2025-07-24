@@ -25,6 +25,7 @@ export const wordRequestsRouter = createTRPCRouter({
           SELECT * FROM word_requests
           WHERE user_id = ${ctx.user.id} AND word = ${word} AND category = ${category}
         `;
+
         if (existing.length > 0) {
           throw new TRPCError({
             code: "CONFLICT",
