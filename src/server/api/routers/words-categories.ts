@@ -54,6 +54,7 @@ export const wordsCategoriesRouter = createTRPCRouter({
   generateCategoriesList: publicProcedure.query(
     async (): Promise<DBCategory[]> => {
       try {
+        await sql`SELECT SETSEED(0.42)`;
         const categoriesList: DBCategory[] = await sql`
             SELECT category
             FROM categories
