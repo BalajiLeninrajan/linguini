@@ -14,7 +14,11 @@ export type LeaderboardUser = {
   time: number;
 };
 
-export type TimeValue = number | { minutes: number } | null | undefined;
+export type TimeValue =
+  | number
+  | { minutes: number; seconds: number }
+  | null
+  | undefined;
 
 export type userGroup = {
   id: string;
@@ -33,5 +37,4 @@ export type userInvite = {
   group_id: number;
   username: string;
   name: string;
-}
-
+};

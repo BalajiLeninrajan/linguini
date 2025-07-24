@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { sql, WordRequestStatus, type DBWordRequest } from "~/server/db";
+import { sql, type DBWordRequest } from "~/server/db";
 
 export const wordRequestsRouter = createTRPCRouter({
   /**
@@ -34,7 +34,7 @@ export const wordRequestsRouter = createTRPCRouter({
 
         await sql`
           INSERT INTO word_requests (user_id, word, category, status)
-          VALUES (${ctx.user.id}, ${word}, ${category}, ${WordRequestStatus.Pending})
+          VALUES (${ctx.user.id}, ${word}, ${category}, 'Pending')
         `;
 
         await sql`COMMIT`;

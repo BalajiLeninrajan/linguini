@@ -1,5 +1,4 @@
 "use client";
-import type { Timestamp } from "next/dist/server/lib/cache-handlers/types";
 import type { LeaderboardUser } from "~/server/db";
 import type { TimeValue } from "~/types";
 
@@ -14,7 +13,9 @@ export default function LeaderboardContainer({ users }: UserProps) {
     }
     if (typeof time === "object" && time !== null) {
       console.log(time);
-      return time.minutes;
+      if (!time.seconds) return "0:00";
+      if (!time.minutes) return `0:${time.seconds.toString().padStart(2, "0")}`;
+      return `${time.minutes}:${time.seconds.toString().padStart(2, "0")}`;
     }
     return time;
   };
@@ -36,8 +37,8 @@ export default function LeaderboardContainer({ users }: UserProps) {
             <p className="text-xl font-bold text-amber-700">
               {value.category_count} ct.
             </p>
-            <p className="ml-8 w-5 text-xl font-bold text-amber-700">
-              {formatTime(value.time)}s
+            <p className="mr-4 ml-8 w-5 text-xl font-bold text-amber-700">
+              {formatTime(value.time)}
             </p>
           </div>
         </div>
