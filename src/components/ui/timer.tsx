@@ -16,10 +16,7 @@ const formatTime = (totalSeconds: number): string => {
 export function Timer({ seconds, className }: TimerProps) {
   return (
     <div className={cn("text-center", className)}>
-      <div
-        className="text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl"
-        style={{ color: "#CD853F" }}
-      >
+      <div className="text-3xl font-bold text-red-500 sm:text-4xl md:text-5xl lg:text-6xl">
         {formatTime(seconds)}
       </div>
     </div>

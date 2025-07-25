@@ -6,7 +6,7 @@ import { Users, Home, BarChart3, Heart, LogOut } from "lucide-react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 
-export default function Header() {
+export default function Header({ blood = false }) {
   const router = useRouter();
   const currentUser = api.auth.currentUser.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -24,13 +24,23 @@ export default function Header() {
 
       <div className="flex items-center">
         <Image src="/linguini.svg" alt="Linguini" width={250} height={250} />
-        <Image
-          src="/pasta.svg"
-          alt="Linguini"
-          width={250}
-          height={200}
-          className="absolute top-24 left-0 hidden sm:block"
-        />
+        {blood ? (
+          <Image
+            src="/blood.png"
+            alt="Linguini"
+            width={500}
+            height={400}
+            className="absolute top-16 left-0 hidden sm:block"
+          />
+        ) : (
+          <Image
+            src="/pasta.svg"
+            alt="Linguini"
+            width={250}
+            height={200}
+            className="absolute top-24 left-0 hidden sm:block"
+          />
+        )}
       </div>
 
       {currentUser.data ? (

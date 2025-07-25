@@ -244,8 +244,8 @@ export default function GamePage() {
 
   return (
     <>
-      <Header />
-      <div className="min-h-screen bg-[#FFF1D4]">
+      <Header blood={true} />
+      <div className="min-h-screen bg-black">
         <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-3 sm:px-4">
           <div className="w-full max-w-xs space-y-12 sm:max-w-sm sm:space-y-16 md:max-w-md">
             <div className="-mt-12 sm:-mt-20">
@@ -286,7 +286,7 @@ export default function GamePage() {
                   }
                 />
                 <Button
-                  variant="default"
+                  variant="danger"
                   className="w-full"
                   type="submit"
                   disabled={
@@ -297,7 +297,7 @@ export default function GamePage() {
                 </Button>
               </form>
               <Button
-                variant="default"
+                variant="danger"
                 className="w-full"
                 onClick={() =>
                   setGameState((prev) => ({

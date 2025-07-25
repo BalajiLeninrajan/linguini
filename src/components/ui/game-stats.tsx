@@ -20,16 +20,16 @@ export function GameStats({
       )}
     >
       <div className="text-center">
-        <div className="text-2xl font-bold text-amber-900 sm:text-3xl md:text-4xl lg:text-5xl">
+        <div className="text-2xl font-bold text-red-700 sm:text-3xl md:text-4xl lg:text-5xl">
           {characterCount}/100
         </div>
-        <div className="text-xs text-gray-600 sm:text-sm">character count</div>
+        <div className="text-xs text-red-300 sm:text-sm">character count</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold text-amber-900 sm:text-3xl md:text-4xl lg:text-5xl">
+        <div className="text-2xl font-bold text-red-700 sm:text-3xl md:text-4xl lg:text-5xl">
           {categoryCount}
         </div>
-        <div className="text-xs text-gray-600 sm:text-sm">category count</div>
+        <div className="text-xs text-red-300 sm:text-sm">category count</div>
       </div>
     </div>
   );
