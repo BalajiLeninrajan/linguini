@@ -57,7 +57,7 @@ export const wordsCategoriesRouter = createTRPCRouter({
         await sql`SELECT SETSEED(0.42)`;
         const categoriesList: DBCategory[] = await sql`
             SELECT category
-            FROM categories
+            FROM evil_categories
             ORDER BY RANDOM();
         `;
         return categoriesList;
