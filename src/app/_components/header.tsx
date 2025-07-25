@@ -60,11 +60,6 @@ export default function Header({ blood = false }) {
               <BarChart3 />
             </Button>
           </Link>
-          <Link href="/about">
-            <Button variant="nav" size="nav">
-              <Heart />
-            </Button>
-          </Link>
           <Button variant="nav" size="nav" onClick={handleLogout}>
             <LogOut />
           </Button>
