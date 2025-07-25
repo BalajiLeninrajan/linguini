@@ -168,7 +168,7 @@ export default function GamePage() {
           categoryCount: gameState.categoryCount,
           endTime: playData
             ? new Date(playData.start_time.getTime() + gameState.seconds * 1000)
-            : new Date(0),
+            : new Date(),
         });
       }
     };
