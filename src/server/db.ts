@@ -22,8 +22,7 @@ if (env.USE_LOCAL) {
 }
 
 export const sql = neon(
-  // env.USE_LOCAL ? DEV_CONFIG.connectionString : env.DATABASE_URL,
-  "postgresql://neondb_owner:npg_uyS2vqhmcFK9@ep-super-king-a4wrm5mz-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+  env.USE_LOCAL ? DEV_CONFIG.connectionString : env.DATABASE_URL,
 ) as <T = unknown>(
   strings: TemplateStringsArray,
   ...values: unknown[]
