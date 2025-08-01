@@ -3,6 +3,7 @@ import {
   createTRPCRouter,
   publicProcedure,
 } from "~/server/api/trpc";
+
 import { sql, type DBGame } from "~/server/db";
 
 async function getTodaysGame() {

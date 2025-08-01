@@ -3,7 +3,6 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { sql, type DBWordCategory, type DBCategory } from "~/server/db";
 
-
 export const wordsCategoriesRouter = createTRPCRouter({
   /**
    * Verify if the word entered by the user matches the category
@@ -18,24 +17,24 @@ export const wordsCategoriesRouter = createTRPCRouter({
         category: z.string().min(1, "Category is required"),
       }),
     )
-    .query(async ({ input }): Promise<boolean> => {
+    .mutation(async ({ input }): Promise<boolean> => {
       const { word, category } = input;
       try {
         const response: DBWordCategory[] = await sql`
-                WITH RECURSIVE
-                Search(word, category, depth) AS (
-                    SELECT word, category, 0 from word_categories WHERE word = ${word}
+            WITH RECURSIVE
+            Search(word, category, depth) AS (
+                SELECT word, category, 0 from word_categories WHERE word = ${word}
 
-                    UNION
+                UNION
 
-                    SELECT s.word, wc.category, s.depth + 1
-                    FROM search s, word_categories wc
-                    WHERE s.category = wc.word AND s.word != wc.category AND s.depth < 5
-                )
-                SELECT *
-                FROM search
-                WHERE word = ${word} AND category = ${category}
-            `;
+                SELECT s.word, wc.category, s.depth + 1
+                FROM search s, word_categories wc
+                WHERE s.category = wc.word AND s.word != wc.category AND s.depth < 5
+            )
+            SELECT *
+            FROM search
+            WHERE word = ${word} AND category = ${category}
+        `;
         return response.length != 0;
       } catch (error) {
         if (error instanceof TRPCError) {
@@ -53,15 +52,15 @@ export const wordsCategoriesRouter = createTRPCRouter({
    * @throws {TRPCError} If something goes wrong
    */
   generateCategoriesList: publicProcedure
-  .input(
+    .input(
       z.object({
-        seed: z.number().min(0).lt(1)
+        seed: z.number().min(0).lt(1),
       }),
-    ).query(
-    async ({input}): Promise<DBCategory[]> => {
-      const {seed} = input;
+    )
+    .query(async ({ input }): Promise<DBCategory[]> => {
+      const { seed } = input;
       try {
-        await sql`SELECT SETSEED(${seed})`
+        await sql`SELECT SETSEED(${seed})`;
         const categoriesList: DBCategory[] = await sql`
             SELECT category
             FROM categories
@@ -78,6 +77,5 @@ export const wordsCategoriesRouter = createTRPCRouter({
           message: "An unexpected error occurred",
         });
       }
-    },
-  ),
+    }),
 });
