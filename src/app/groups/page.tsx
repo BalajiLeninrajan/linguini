@@ -7,18 +7,17 @@ import { GroupName } from "~/components/ui/group-name";
 import { api } from "~/trpc/react";
 import Link from "next/link";
 import Alert from "../_components/alertComponent";
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 export default function GroupsPage() {
-  const [groups, setGroups] = useState<
-    { id: number; name: string; canEdit: boolean }[]
-  >();
+  const [groups, setGroups] =
+    useState<{ id: number; name: string; canEdit: boolean }[]>();
   const [showAlert, setShowAlert] = useState(false);
   const [alertContent, setAlertContent] = useState("");
   const [pendingAction, setPendingAction] = useState<null | {
-    type: 'delete' | 'leave',
-    groupId: number,
-    groupName: string
+    type: "delete" | "leave";
+    groupId: number;
+    groupName: string;
   }>(null);
 
   const currentUser = api.auth.currentUser.useQuery(undefined, {
@@ -77,17 +76,16 @@ export default function GroupsPage() {
   }, [groupIDs.data, userId]);
 
   const deleteGroup = (groupId: number, groupName: string) => {
-      setAlertContent(`You are about to delete your group ${groupName}`);
-      setPendingAction({type: 'delete', groupId, groupName});
-      setShowAlert(true);
-  }
+    setAlertContent(`You are about to delete your group ${groupName}`);
+    setPendingAction({ type: "delete", groupId, groupName });
+    setShowAlert(true);
+  };
 
   const leaveGroup = (groupId: number, groupName: string) => {
     setAlertContent(`You are about to leave a group ${groupName}`);
-    setPendingAction({type: 'leave', groupId, groupName});
+    setPendingAction({ type: "leave", groupId, groupName });
     setShowAlert(true);
-  }
-
+  };
 
   return (
     <>
@@ -159,7 +157,7 @@ export default function GroupsPage() {
                 <Link href="/groups/group_creation">
                   <Button
                     variant="default"
-                    className="h-16 w-full text-base font-bold sm:text-lg mb-2"
+                    className="mb-2 h-16 w-full text-base font-bold sm:text-lg"
                   >
                     Create Group
                   </Button>
@@ -179,7 +177,7 @@ export default function GroupsPage() {
                 <Link href="/groups/group_creation">
                   <Button
                     variant="default"
-                    className="h-16 w-full text-base font-bold sm:text-lg mb-2"
+                    className="mb-2 h-16 w-full text-base font-bold sm:text-lg"
                   >
                     Create Group
                   </Button>
@@ -205,39 +203,35 @@ export default function GroupsPage() {
         onOpenChange={setShowAlert}
         body={alertContent}
         onConfirm={() => {
-          if(!pendingAction){
+          if (!pendingAction) {
             return;
           }
 
-          if(pendingAction.type == 'delete'){
-            try{
-                deleteGroupHook({
-                  groupId: pendingAction.groupId,
-                })
-
-            }catch(error){
+          if (pendingAction.type == "delete") {
+            try {
+              deleteGroupHook({
+                groupId: pendingAction.groupId,
+              });
+            } catch (error) {
               console.log(error);
-              toast("Something went wrong, please try again.")
+              toast("Something went wrong, please try again.");
             }
           }
 
-          if(pendingAction.type == 'leave'){
-            try{
+          if (pendingAction.type == "leave") {
+            try {
               leaveGroupHook({
                 groupId: pendingAction.groupId,
-              })
-
-            }catch(error){
+              });
+            } catch (error) {
               console.log(error);
-              toast("Something went wrong, please try again.")
+              toast("Something went wrong, please try again.");
             }
           }
-          
+
           setShowAlert(false);
         }}
       />
     </>
   );
 }
-
-

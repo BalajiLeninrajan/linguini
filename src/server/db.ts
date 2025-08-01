@@ -137,4 +137,3 @@ export interface UserInvite {
   username: string;
   name: string;
 }
-

@@ -38,11 +38,10 @@ export const leaderboardRouter = createTRPCRouter({
 
         //select top 10 users
         const getTop10Users: LeaderboardUser[] = await sql`
-          SELECT users.username, plays.category_count, (plays.end_time - plays.start_time) as time
-          FROM plays JOIN users ON users.id = plays.user_id
-          WHERE plays.game_id = ${gameId} AND plays.end_time IS NOT NULL
-          ORDER BY plays.category_count ASC,
-          (plays.end_time - plays.start_time) ASC
+          SELECT username, category_count, time
+          FROM leaderboard_view
+          WHERE game_id = ${gameId}
+          ORDER BY category_count ASC, time ASC
           LIMIT 10;
         `;
 
@@ -166,12 +165,10 @@ export const leaderboardRouter = createTRPCRouter({
       const { groupId, gameId } = input;
       try {
         const groupRankings: LeaderboardUser[] = await sql`
-          SELECT DISTINCT users.username, plays.category_count, (plays.end_time - plays.start_time) as time FROM plays 
-          JOIN users ON users.id = plays.user_id
-          JOIN group_users ON group_users.user_id = users.id
-          WHERE plays.game_id = ${gameId} AND plays.end_time IS NOT NULL AND group_users.group_id = ${groupId}
-          ORDER BY plays.category_count ASC,
-          (plays.end_time - plays.start_time) ASC;
+          SELECT username, category_count, time
+          FROM leaderboard_view
+          WHERE game_id = ${gameId} AND group_id = ${groupId}
+          ORDER BY category_count ASC, time ASC;
         `;
         if (!groupRankings) {
           throw new TRPCError({

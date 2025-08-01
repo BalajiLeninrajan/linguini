@@ -103,3 +103,5 @@ CREATE INDEX IF NOT EXISTS  word_idx ON word_categories(word);
 
 CREATE INDEX IF NOT EXISTS category_idx ON word_categories(category);
 
+CREATE INDEX IF NOT EXISTS date_idx ON games(created_at);
+
