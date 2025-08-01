@@ -43,7 +43,9 @@ export default function GamePage() {
   );
 
   const { data: categories } =
-    api.wordCategories.generateCategoriesList.useQuery();
+    api.wordCategories.generateCategoriesList.useQuery({
+      seed: 0.42,
+    });
 
   useEffect(() => {
     if (playData) {

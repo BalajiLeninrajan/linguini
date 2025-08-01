@@ -3,7 +3,6 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { sql, type DBWordCategory, type DBCategory } from "~/server/db";
 
-
 export const wordsCategoriesRouter = createTRPCRouter({
   /**
    * Verify if the word entered by the user matches the category
@@ -53,15 +52,15 @@ export const wordsCategoriesRouter = createTRPCRouter({
    * @throws {TRPCError} If something goes wrong
    */
   generateCategoriesList: publicProcedure
-  .input(
+    .input(
       z.object({
-        seed: z.number().min(0).lt(1)
+        seed: z.number().min(0).lt(1),
       }),
-    ).query(
-    async ({input}): Promise<DBCategory[]> => {
-      const {seed} = input;
+    )
+    .query(async ({ input }): Promise<DBCategory[]> => {
+      const { seed } = input;
       try {
-        await sql`SELECT SETSEED(0.42)`;
+        await sql`SELECT SETSEED(${seed})`;
         const categoriesList: DBCategory[] = await sql`
             SELECT category
             FROM categories
@@ -78,6 +77,5 @@ export const wordsCategoriesRouter = createTRPCRouter({
           message: "An unexpected error occurred",
         });
       }
-    },
-  ),
+    }),
 });
